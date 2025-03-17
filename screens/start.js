@@ -4,7 +4,7 @@ import { View, Image, StyleSheet } from 'react-native';
 const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace('welcome');
+      navigation.replace('l2_chapter3');
     }, 3000); 
 
     return () => clearTimeout(timer);

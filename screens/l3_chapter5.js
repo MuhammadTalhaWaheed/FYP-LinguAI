@@ -7,7 +7,7 @@ import * as Speech from 'expo-speech';
 import { Audio } from 'expo-av';
 import axios from 'axios';
 
-const l3_Chapter5Screen = ({ navigation }) => {
+const L3_Chapter5Screen = ({ navigation }) => {
   const playAudio = (text) => {
     Speech.speak(text, {
       language: 'en-US',
@@ -512,4 +512,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default l3_Chapter5Screen;
+export default L3_Chapter5Screen;

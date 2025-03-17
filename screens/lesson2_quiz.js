@@ -11,6 +11,7 @@ const Lesson2_quiz = ({ navigation }) => {
   const [recording, setRecording] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [multipleChoiceAnswer, setMultipleChoiceAnswer] = useState('');
+  const [recognizedText, setRecognizedText] = useState("");
 
   const playAudio = (text) => {
     Speech.speak(text, {
@@ -21,33 +22,76 @@ const Lesson2_quiz = ({ navigation }) => {
   };
 
   const startRecording = async () => {
-    try {
-      const permission = await Audio.requestPermissionsAsync();
-      if (!permission.granted) {
-        alert('Microphone permission is required to record audio');
-        return;
-      }
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
-      );
-      setRecording(recording);
-      setIsRecording(true);
-    } catch (err) {
-      console.error('Failed to start recording:', err);
-    }
-  };
-
-  const stopRecording = async () => {
-    try {
-      setIsRecording(false);
-      await recording.stopAndUnloadAsync();
-      setRecording(null);
-      Alert.alert('Recording Saved', 'Your response has been recorded.');
-    } catch (err) {
-      console.error('Failed to stop recording:', err);
-    }
-  };
-
+     try {
+       const { status } = await Audio.requestPermissionsAsync();
+       if (status !== 'granted') {
+         Alert.alert("Permission Denied", "You need to grant audio permissions.");
+         return;
+       }
+   
+       const recording = new Audio.Recording();
+       await recording.prepareToRecordAsync(Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY);
+       await recording.startAsync();
+   
+       setRecording(recording);
+       setIsRecording(true);
+       console.log("Recording started...");
+     } catch (error) {
+       console.error("Error starting recording:", error);
+     }
+   };
+   
+   const stopRecording = async () => {
+     if (!recording) {
+       console.warn("No active recording found.");
+       return;
+     }
+   
+     try {
+       await recording.stopAndUnloadAsync();
+       const uri = recording.getURI();
+       console.log("Recording saved at:", uri);
+       setRecording(null);
+       setIsRecording(false);
+       sendAudioToBackend(uri);
+     } catch (error) {
+       console.error("Error stopping recording:", error);
+     }
+   };
+   
+   const sendAudioToBackend = async (uri) => {
+     try {
+       const formData = new FormData();
+       formData.append("audio", { 
+         uri: uri,
+         name: "recording2.3gp", 
+         type: "audio/3gp", 
+       });
+   
+       const response = await fetch("http://192.168.1.111:5000/upload", {
+         method: "POST",
+         headers: {
+           "Content-Type": "multipart/form-data",
+         },
+         body: formData,
+       });
+   
+       const text = await response.text();
+       console.log("Raw response:", text);
+   
+       const data = JSON.parse(text);
+       console.log("Parsed JSON:", data);
+       if (data.recognized_text) {
+         setRecognizedText(data.recognized_text);
+       }
+   
+       Alert.alert("Success", "Audio file uploaded successfully!");
+     } catch (error) {
+       console.error("Error uploading audio:", error);
+       Alert.alert("Upload Failed", "Could not upload the audio file.");
+     }
+   };
+   
   const submitAssessment = () => {
     Alert.alert('Assessment Submitted', 'Your answers have been recorded.');
   };
@@ -98,6 +142,10 @@ const Lesson2_quiz = ({ navigation }) => {
           <MaterialCommunityIcons name={isRecording ? 'stop-circle' : 'microphone'} size={24} color='white' />
           <Text style={styles.recordButtonText}>{isRecording ? 'Stop Recording' : 'Start Recording'}</Text>
         </TouchableOpacity>
+        <View style={styles.section}>
+          <Text style={styles.question}>Recognized Text:</Text>
+          <Text style={styles.recognizedText}>{recognizedText || "No text recognized yet"}</Text>
+        </View>
       </View>
 
       {/* Multiple Choice */}
@@ -132,6 +180,14 @@ const Lesson2_quiz = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  recognizedText: {
+    fontSize: 16,
+    color: "#333",
+    backgroundColor: "#f0f0f0",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 5,
+  },
   container: {
     flexGrow: 1,
     paddingHorizontal: 20,

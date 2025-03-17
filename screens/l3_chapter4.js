@@ -7,7 +7,7 @@ import * as Speech from 'expo-speech';
 import { Audio } from 'expo-av';
 import axios from 'axios';
 
-const l3_Chapter4Screen = ({ navigation }) => {
+const L3_Chapter4Screen = ({ navigation }) => {
   const playAudio = (text) => {
     Speech.speak(text, {
       language: 'en-US',
@@ -268,7 +268,7 @@ const l3_Chapter4Screen = ({ navigation }) => {
       </View>
 
 
-      <TouchableOpacity style={styles.nextButton} onPress={() => navigation.navigate('l3_chapter5')}>
+      <TouchableOpacity style={styles.nextButton} onPress={() => navigation.navigate('L3_chapter5')}>
         <Text style={styles.nextButtonText}>Next Chapter →</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -512,4 +512,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default l3_Chapter4Screen;
+export default L3_Chapter4Screen;

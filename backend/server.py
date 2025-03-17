@@ -4,6 +4,8 @@ import torch
 import numpy as np
 from firebase_admin import firestore,credentials, initialize_app
 import firebase_admin
+import ffmpeg
+
 app = Flask(__name__)
 
 # Initialize Firestore
@@ -14,6 +16,106 @@ db = firestore.client()
 # Load model and tokenizer
 model = AutoModelForSequenceClassification.from_pretrained("Kevintu/Engessay_grading_ML")
 tokenizer = AutoTokenizer.from_pretrained("KevSun/Engessay_grading_ML")
+
+from flask import Flask, request, jsonify
+import os
+import azure.cognitiveservices.speech as speechsdk
+from werkzeug.utils import secure_filename
+
+SPEECH_KEY = "2WqE0STm4J40xVUlUvxBQqnqU9c0mCN20t4pZTOEUiAjVh3XhVEKJQQJ99BCACYeBjFXJ3w3AAAYACOGpmj7"  # Replace with your actual key
+SERVICE_REGION = "eastus"
+
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+
+@app.route("/upload", methods=["POST"])
+def upload_audio():
+    try:
+        # Check if file is in request
+        if "audio" not in request.files:
+            return jsonify({"error": "No file uploaded"}), 400
+
+        file = request.files["audio"]
+        filename = file.filename
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        file.save(filepath)
+        # Validate file type
+        if not filepath.endswith(".wav"):
+            filepath = convert_to_wav(filepath)
+        print(filepath)
+        result = analyze_pronunciation(filepath)
+
+        return jsonify(result), 200
+
+    except Exception as e:
+        print("Error:", str(e))  # Log error
+        return jsonify({"error": str(e)}), 500
+
+
+import os
+import ffmpeg
+
+def convert_to_wav(input_path):
+    output_dir = "E:/my-app/temp_audio"
+    os.makedirs(output_dir, exist_ok=True)  # Ensure the directory exists
+
+    # Get the base filename without extension
+    base_filename = os.path.basename(input_path).rsplit(".", 1)[0]  
+
+    # Create the full output path
+    output_path = os.path.join(output_dir, base_filename + ".wav")  
+
+    try:
+        (
+            ffmpeg
+            .input(input_path)
+            .output(output_path, format="wav", acodec="pcm_s16le", ar="16000")  # Ensure 16kHz sample rate
+            .run(overwrite_output=True)  # Overwrite if exists
+        )
+        print(f"Converted file saved to: {output_path}")
+        return output_path
+    except ffmpeg.Error as e:
+        print("FFmpeg error:", e)
+        return None
+
+
+def analyze_pronunciation(audio_file):
+    """Analyzes pronunciation using Azure Speech Services."""
+    print(f"🔹 Using file: {audio_file}")
+
+    speech_config = speechsdk.SpeechConfig(subscription=SPEECH_KEY, region=SERVICE_REGION)
+    audio_config = speechsdk.audio.AudioConfig(filename=audio_file)
+
+    # Check if the AudioConfig object is created
+    print(f"🔍 AudioConfig object: {audio_config}")
+
+    # Enable pronunciation assessment
+    pronunciation_config = speechsdk.PronunciationAssessmentConfig(
+        grading_system=speechsdk.PronunciationAssessmentGradingSystem.HundredMark,
+        granularity=speechsdk.PronunciationAssessmentGranularity.Word
+    )
+
+    recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
+    print(f"🔍 SpeechRecognizer object: {recognizer}")
+
+    pronunciation_config.apply_to(recognizer)
+
+    result = recognizer.recognize_once()
+    print(f"🔍 Recognition Result: {result.reason}")
+
+    if result.reason == speechsdk.ResultReason.RecognizedSpeech:
+        pronunciation_result = speechsdk.PronunciationAssessmentResult(result)
+        return {
+            "recognized_text": result.text,
+            "pronunciation_score": pronunciation_result.pronunciation_score,
+            "accuracy_score": pronunciation_result.accuracy_score,
+            "fluency_score": pronunciation_result.fluency_score,
+            "completeness_score": pronunciation_result.completeness_score,
+        }
+    else:
+        print(f"❌ Error: {result.reason}")
+        return {"error": f"Speech not recognized. Reason: {result.reason}"}
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -100,4 +202,4 @@ def calculate_average_scores():
         return jsonify({"error": f"Error processing data: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    app.run(host='172.16.73.172', port=5000, debug=True)
+    app.run(host='192.168.1.111', port=5000, debug=True)

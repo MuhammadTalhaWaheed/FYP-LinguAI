@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const l3_ChapterScreen = ({ navigation }) => {
+const L3_ChapterScreen = ({ navigation }) => {
   const chapters = [
     'Starting a Conversation',
     'Asking About Preferences',
@@ -92,4 +92,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default l3_ChapterScreen;
+export default L3_ChapterScreen;

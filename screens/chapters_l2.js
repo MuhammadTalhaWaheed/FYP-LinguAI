@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const l2_ChapterScreen = ({ navigation }) => {
+const L2_ChapterScreen = ({ navigation }) => {
   const chapters = [
     'Talking About Morning Routines',
     'Describing Work or School',
@@ -92,4 +92,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default l2_ChapterScreen;
+export default L2_ChapterScreen;

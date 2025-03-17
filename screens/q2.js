@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Button, Text, StyleSheet, ActivityIndicator, Image } from "react-native";
+import { View, Button, Text, StyleSheet, ActivityIndicator, Image ,Alert } from "react-native";
 import { Audio } from "expo-av";
 import axios from "axios";
 import { getFirestore, doc, setDoc } from "firebase/firestore"; 
@@ -50,156 +50,82 @@ const Question2Screen = () => {
   const [grammar, setGrammar] = useState(null);
   const [vocab, setVocab] = useState(null);
   const [cohesion, setCohesion] = useState(null);
+  const [recognizedText, setRecognizedText] = useState("");
 
   const navigation = useNavigation();
 
-  const apiKey = "d165f0d262e04e9ca4e64362d7c5a0b2"; 
-  const uploadUrl = "https://api.assemblyai.com/v2/upload";
-  const transcriptUrl = "https://api.assemblyai.com/v2/transcript";
+ const startRecording = async () => {
+       try {
+         const { status } = await Audio.requestPermissionsAsync();
+         if (status !== 'granted') {
+           Alert.alert("Permission Denied", "You need to grant audio permissions.");
+           return;
+         }
+     
+         const recording = new Audio.Recording();
+         await recording.prepareToRecordAsync(Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY);
+         await recording.startAsync();
+     
+         setRecording(recording);
+         setIsRecording(true);
+         console.log("Recording started...");
+       } catch (error) {
+         console.error("Error starting recording:", error);
+       }
+     };
+     
+     const stopRecording = async () => {
+       if (!recording) {
+         console.warn("No active recording found.");
+         return;
+       }
+     
+       try {
+         await recording.stopAndUnloadAsync();
+         const uri = recording.getURI();
+         console.log("Recording saved at:", uri);
+         setRecording(null);
+         setIsRecording(false);
+         sendAudioToBackend(uri);
+       } catch (error) {
+         console.error("Error stopping recording:", error);
+       }
+     };
+     
+     const sendAudioToBackend = async (uri) => {
+       try {
+         const formData = new FormData();
+         formData.append("audio", { 
+           uri: uri,
+           name: "recording_q2.3gp", 
+           type: "audio/3gp", 
+         });
+     
+         const response = await fetch("http://192.168.1.111:5000/upload", {
+           method: "POST",
+           headers: {
+             "Content-Type": "multipart/form-data",
+           },
+           body: formData,
+         });
+     
+         const text = await response.text();
+         console.log("Raw response:", text);
+     
+         const data = JSON.parse(text);
+         console.log("Parsed JSON:", data);
+         if (data.recognized_text) {
+           setRecognizedText(data.recognized_text);
+         }
+         setTimeout(() => {
+          navigation.navigate('q3a');  // Replace 'q3a' with the correct screen name
+        }, 2000);
 
-  const startRecording = async () => {
-    try {
-      const permission = await Audio.requestPermissionsAsync();
-      if (!permission.granted) {
-        alert("Microphone permission is required to record audio");
-        return;
-      }
-
-      const { recording } = await Audio.Recording.createAsync({
-        android: {
-          extension: ".m4a",
-          outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_MPEG_4,
-          audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AAC,
-          sampleRate: 16000,
-          numberOfChannels: 1,
-        },
-        ios: {
-          extension: ".m4a",
-          outputFormat: Audio.RECORDING_OPTION_IOS_OUTPUT_FORMAT_MPEG4AAC,
-          audioQuality: Audio.RECORDING_OPTION_IOS_AUDIO_QUALITY_HIGH,
-          sampleRate: 16000,
-          numberOfChannels: 1,
-        },
-      });
-
-      setRecording(recording);
-      setIsRecording(true);
-
-      setTimeout(() => {
-        if (isRecording) {
-          stopRecording();
-        }
-      }, 30000); 
-    } catch (err) {
-      console.error("Failed to start recording:", err);
-    }
-  };
-  var durationSeconds;
-
-  const stopRecording = async () => {
-    try {
-      setIsRecording(false);
-      await recording.stopAndUnloadAsync();
-      const { durationMillis } = await recording.getStatusAsync();  
-      durationSeconds = durationMillis / 1000;
-      setRecording(null);
-  
-    
-      sendAudioToAssemblyAI(recording.getURI());
-    } catch (err) {
-      console.error("Failed to stop recording:", err);
-    }
-  };
-  const sendTranscriptionToBackend = async (transcription) => {
-    const userId = auth.currentUser?.uid;  // Make sure this is properly set
-    const questionNumber = 2;
-    const fluencyScore = calculateFluency(transcription, durationSeconds); 
-
-    try {
-      const response = await fetch("http://172.16.73.172:5000/predict", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ transcription ,user_id: userId,question_number: questionNumber, fluency: fluencyScore}),
-      });
-  
-      const data = await response.json(); // Parse JSON response
-      console.log("Received data from backend:", data);
-  
-      // Update state with parsed data
-      setGrammar(data.grammar);
-      setVocab(data.vocabulary); // Ensure this matches the backend key
-      setCohesion(data.cohesion);
-      
-    } catch (error) {
-      console.error("Error during API call:", error);
-    }
-  };
-  
-  const sendAudioToAssemblyAI = async (uri) => {
-    setIsLoading(true);
-    setTranscription("");  // Clear previous transcription
-  
-    try {
-      const audioFile = await fetch(uri).then((res) => res.blob());
-      const uploadResponse = await fetch(uploadUrl, {
-        method: "POST",
-        headers: {
-          authorization: apiKey,
-          "content-type": "application/octet-stream",
-        },
-        body: audioFile,
-      });
-  
-      const uploadData = await uploadResponse.json();
-      const audioUrl = uploadData.upload_url;
-  
-      const transcriptResponse = await axios.post(
-        transcriptUrl,
-        { audio_url: audioUrl },
-        {
-          headers: {
-            authorization: apiKey,
-            "content-type": "application/json",
-          },
-        }
-      );
-  
-      const transcriptId = transcriptResponse.data.id;
-  
-      let transcriptionCompleted = false;
-      while (!transcriptionCompleted) {
-        const statusResponse = await axios.get(
-          `${transcriptUrl}/${transcriptId}`,
-          { headers: { authorization: apiKey } }
-        );
-        const statusData = statusResponse.data;
-  
-        if (statusData.status === "completed") {
-          transcriptionCompleted = true;
-          const transcriptionText = statusData.text;
-          setTranscription(transcriptionText);
-  
-          // Send transcription to the backend
-          await sendTranscriptionToBackend(transcriptionText);
-          
-          //await saveAnswer(transcriptionText,fluency, grammar, vocab, cohesion);
-          navigation.navigate("q3a");
-        } else if (statusData.status === "failed") {
-          setTranscription("Transcription failed. Please try again.");
-          break;
-        }
-  
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-      }
-    } catch (err) {
-      console.error("Error during transcription:", err);
-      setTranscription("An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+       } catch (error) {
+         console.error("Error uploading audio:", error);
+       }
+     };
+ 
   
 
   return (
@@ -256,16 +182,10 @@ const Question2Screen = () => {
         </View>
       )}
 
-      {transcription && (
-        <View style={styles.result}>
-          <Text style={styles.label}>Transcription:</Text>
-          <Text style={styles.text}>{transcription}</Text>
-          {/* <Text style={styles.label}>Vocabulary Score: {vocab}</Text>
-          <Text style={styles.label}>Grammar Score: {grammar}</Text>
-          <Text style={styles.label}>Cohesion Score: {cohesion}</Text> */}
-
-        </View>
-      )}
+      <View style={styles.result}>
+                <Text style={styles.label}>Transcription:</Text>
+                <Text style={styles.text}>{recognizedText}</Text>
+              </View>
     </View>
   );
 };
