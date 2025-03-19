@@ -38,7 +38,7 @@ import l2_Chapter5Screen from './screens/l2_chapter5';
 import Lesson2_quiz from './screens/lesson2_quiz';
 import Lesson3_quiz from './screens/lesson3_quiz';
 
-
+import Lesson_award_beg_to_inter from './screens/lesson_award_beg_to_inter';
 import l3_Chapter1Screen from './screens/l3_chapter1';
 import l3_Chapter2Screen from './screens/l3_chapter2';
 import l3_Chapter3Screen from './screens/l3_chapter3';
@@ -101,6 +101,8 @@ export default function App() {
         <Stack.Screen name='l3_chapter4' component={l3_Chapter4Screen}/>
         <Stack.Screen name='l3_chapter5' component={l3_Chapter5Screen}/>
         <Stack.Screen name='lesson3_quiz' component={Lesson3_quiz}/>
+
+        <Stack.Screen name='Lesson_award_beg_to_inter' component={Lesson_award_beg_to_inter}/>
 
 
 

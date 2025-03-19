@@ -6,7 +6,32 @@ import { Picker } from '@react-native-picker/picker';
 import { getDatabase, ref, set } from 'firebase/database';  
 import { getAuth } from 'firebase/auth';
 import { Audio } from 'expo-av';
+import { getFirestore, doc, setDoc } from "firebase/firestore"; 
 
+const saveAnswer = async (selectedText, pronunciation, completeness, fluency, accuracy) => {
+  const auth = getAuth();
+const userId = auth.currentUser ? auth.currentUser.uid : null;
+  if (userId) {
+    const db = getFirestore();
+    try {
+      await setDoc(doc(db, "quiz_answers", userId), {
+        answer1: {
+          transcription: selectedText,
+          fluency: fluency,
+          completeness: completeness,
+          pronunciation: pronunciation,
+          accuracy: accuracy
+        }
+      }, { merge: true });
+      console.log("Answer and scores saved successfully!");
+    } catch (error) {
+      console.error("Error saving answer and scores: ", error);
+    }
+  } else {
+    console.error("No user is logged in! Redirecting to login.");
+
+  }
+};
 
 const Lesson1_quiz = ({ navigation }) => {
   const [selectedAnswer, setSelectedAnswer] = useState('');
@@ -15,6 +40,11 @@ const Lesson1_quiz = ({ navigation }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [multipleChoiceAnswer, setMultipleChoiceAnswer] = useState('');
   const [recognizedText, setRecognizedText] = useState("");
+  
+    const [pronunciation, setpronunciation] = useState("");
+    const [accuracy, setaccuracy] = useState("");
+    const [fluency, setfluency] = useState("");
+    const [completeness, setcompleteness] = useState("");
 
   const playAudio = (text) => {
     Speech.speak(text, {
@@ -72,7 +102,7 @@ const Lesson1_quiz = ({ navigation }) => {
         type: "audio/3gp", 
       });
   
-      const response = await fetch("http://192.168.1.111:5000/upload", {
+      const response = await fetch("http://172.17.41.194:5000/upload", {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
@@ -88,6 +118,13 @@ const Lesson1_quiz = ({ navigation }) => {
       if (data.recognized_text) {
         setRecognizedText(data.recognized_text);
       }
+      setpronunciation(data.pronunciation);
+        setcompleteness(data.completeness);
+        setfluency(data.fluency);
+        setaccuracy(data.accuracy);
+        
+        saveAnswer(data.recognized_text,data.pronunciation_score,data.completeness_score,data.fluency_score,data.accuracy_score);
+        
   
       Alert.alert("Success", "Audio file uploaded successfully!");
     } catch (error) {

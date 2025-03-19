@@ -1,12 +1,17 @@
-import React, { useState } from "react";
-import { View, Button, Text, StyleSheet, ActivityIndicator, Image,Alert  } from "react-native";
+import React, { useState ,useEffect, useRef } from "react";
+
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Easing } from 'react-native';
+
+import {  Button,  ActivityIndicator, Image,Alert  } from "react-native";
 import { Audio } from "expo-av";
 import axios from "axios";
 import { getFirestore, doc, setDoc } from "firebase/firestore"; 
 import { getAuth } from "firebase/auth"; 
 import { useNavigation } from "@react-navigation/native"; 
-const auth = getAuth();
-const saveAnswer = async (selectedText, fluency, grammar, vocab, cohesion) => {
+
+const saveAnswer = async (selectedText, pronunciation, completeness, fluency, accuracy) => {
+  const auth = getAuth();
+const userId = auth.currentUser ? auth.currentUser.uid : null;
   if (userId) {
     const db = getFirestore();
     try {
@@ -14,9 +19,9 @@ const saveAnswer = async (selectedText, fluency, grammar, vocab, cohesion) => {
         answer1: {
           transcription: selectedText,
           fluency: fluency,
-          grammar: grammar,
-          vocabulary: vocab,
-          cohesion: cohesion
+          completeness: completeness,
+          pronunciation: pronunciation,
+          accuracy: accuracy
         }
       }, { merge: true });
       console.log("Answer and scores saved successfully!");
@@ -28,15 +33,6 @@ const saveAnswer = async (selectedText, fluency, grammar, vocab, cohesion) => {
 
   }
 };
-
-
-
-const calculateFluency = (transcription, durationInSeconds) => {
-  const wordCount = transcription.split(" ").length;
-  return wordCount / durationInSeconds;  // Fluency in words per second
-};
-
-
 const Question1Screen = () => {
   const [recording, setRecording] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -44,12 +40,13 @@ const Question1Screen = () => {
   const [isLoading, setIsLoading] = useState(false);
  
   const [recognizedText, setRecognizedText] = useState("");
+  const [pronunciation, setpronunciation] = useState("");
+  const [accuracy, setaccuracy] = useState("");
+  const [fluency, setfluency] = useState("");
+  const [completeness, setcompleteness] = useState("");
+
 
   const navigation = useNavigation();
-
-  const apiKey = "d165f0d262e04e9ca4e64362d7c5a0b2"; 
-  const uploadUrl = "https://api.assemblyai.com/v2/upload";
-  const transcriptUrl = "https://api.assemblyai.com/v2/transcript";
 
   const startRecording = async () => {
       try {
@@ -98,7 +95,7 @@ const Question1Screen = () => {
           type: "audio/3gp", 
         });
     
-        const response = await fetch("http://192.168.1.111:5000/upload", {
+        const response = await fetch("http://172.17.41.194:5000/upload", {
           method: "POST",
           headers: {
             "Content-Type": "multipart/form-data",
@@ -114,8 +111,15 @@ const Question1Screen = () => {
         if (data.recognized_text) {
           setRecognizedText(data.recognized_text);
         }
+        setpronunciation(data.pronunciation);
+        setcompleteness(data.completeness);
+        setfluency(data.fluency);
+        setaccuracy(data.accuracy);
+        
+        saveAnswer(data.recognized_text,data.pronunciation_score,data.completeness_score,data.fluency_score,data.accuracy_score);
+        
         setTimeout(() => {
-          navigation.navigate('q2');  // Replace 'q3a' with the correct screen name
+          navigation.navigate('q2');  
         }, 2000);      } 
         catch (error) {
         console.error("Error uploading audio:", error);
@@ -168,7 +172,6 @@ const Question1Screen = () => {
         onPress={isRecording ? stopRecording : startRecording}
         color={isRecording ? "red" : "green"}
       />
-
       {isLoading && (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color="blue" />

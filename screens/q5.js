@@ -18,7 +18,7 @@ const Question5Screen = ({ navigation }) => {
     const questionNumber = 5;
 
     try {
-      const response = await fetch("http://172.16.73.172:5000/predict", {
+      const response = await fetch("http://172.17.41.194:5000/predict", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

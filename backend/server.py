@@ -164,42 +164,134 @@ def calculate_average_scores():
 
     if not user_id:
         return jsonify({"error": "User ID is required"}), 400
-    
+
     try:
         # Fetching user data
-        user_data = db.collection('user_answers').document(user_id).get().to_dict()
-
-        if not user_data:
-            return jsonify({"error": "User data not found"}), 404
+        user_doc = db.collection('user_answers').document(user_id).get()
         
-        # Calculate averages from the scores
-        total_scores = {"fluency": 0, "grammar": 0, "vocabulary": 0, "cohesion": 0}
-        num_answers = 0
+        if not user_doc.exists:
+            return jsonify({"error": "User data not found"}), 404
 
-        for answer_key, answer in user_data.items():
-            if 'scores' in answer:
-                scores = answer['scores']
-                total_scores["fluency"] += scores.get("fluency", 0)
-                total_scores["grammar"] += scores.get("grammar", 0)
-                total_scores["vocabulary"] += scores.get("vocabulary", 0)
-                total_scores["cohesion"] += scores.get("cohesion", 0)
-                num_answers += 1
+        user_data = user_doc.to_dict()
+        
+        # Initialize total scores
+        total_scores = {"fluency": 0, "accuracy": 0, "completeness": 0, "pronunciation": 0}
+        total_scores_text = {"cohesion": 0, "vocabulary": 0, "grammar": 0, "conventions": 0}
 
+        num_answers = 3
+
+        # Iterate through all answers (answer1, answer2, etc.)
+        for key in ["answer1", "answer2", "answer3"]:
+            answer = user_data.get(key)  # Get specific answer entry
+            if isinstance(answer, dict):  # Ensure it's a dictionary (not some other field)
+                total_scores["fluency"] += answer.get("fluency", 0)
+                total_scores["accuracy"] += answer.get("accuracy", 0)  # Assuming "accuracy" is grammar
+                total_scores["completeness"] += answer.get("completeness", 0)
+                total_scores["pronunciation"] += answer.get("pronunciation", 0)
+        
+        for key in ["answer4", "answer5"]:
+            answer = user_data.get(key)  
+            if isinstance(answer, dict):  
+                total_scores_text["cohesion"] += answer.get("cohesion", 0)
+                total_scores_text["vocabulary"] += answer.get("vocabulary", 0)  # Assuming "accuracy" is grammar
+                total_scores_text["grammar"] += answer.get("grammar", 0)
+                total_scores_text["conventions"] += answer.get("conventions", 0)
         if num_answers == 0:
             return jsonify({"error": "No valid answers found for user"}), 404
 
         # Calculate averages
         averages = {
-            "fluency": total_scores["fluency"] / 3,
-            "grammar": total_scores["grammar"] / num_answers,
-            "vocabulary": total_scores["vocabulary"] / num_answers,
-            "cohesion": total_scores["cohesion"] / num_answers
+            "fluency": total_scores["fluency"] / num_answers,
+            "accuracy": total_scores["accuracy"] / num_answers,
+            "completeness": total_scores["completeness"] / num_answers,
+            "pronunciation": total_scores["pronunciation"] / num_answers
+        }
+        averages_text = {
+            "cohesion": total_scores_text["cohesion"] / num_answers,
+            "vocabulary": total_scores_text["vocabulary"] / num_answers,
+            "grammar": total_scores_text["grammar"] / num_answers,
+            "conventions": total_scores_text["conventions"] / num_answers
         }
 
-        # Send average scores to the frontend
-        return jsonify({"averages": averages}), 200
+        return jsonify({"averages": averages, "averages_text": averages_text}), 200
+
     except Exception as e:
         return jsonify({"error": f"Error processing data: {str(e)}"}), 500
 
+@app.route('/calculate_average_lesson_scores', methods=['POST'])
+def calculate_average_lesson_scores():
+    data = request.get_json()
+    user_id = data.get('user_id')
+
+    if not user_id:
+        return jsonify({"error": "User ID is required"}), 400
+
+    try:
+        # Fetching user data
+        user_doc = db.collection('quiz_answers').document(user_id).get()
+        
+        if not user_doc.exists:
+            return jsonify({"error": "User data not found"}), 404
+
+        user_data = user_doc.to_dict()
+        
+        # Initialize total scores
+        total_scores = {"fluency": 0, "accuracy": 0, "completeness": 0, "pronunciation": 0}
+
+        num_answers = 3
+
+        # Iterate through all answers (answer1, answer2, etc.)
+        for key in ["answer1", "answer2", "answer3"]:
+            answer = user_data.get(key)  # Get specific answer entry
+            if isinstance(answer, dict):  # Ensure it's a dictionary (not some other field)
+                total_scores["fluency"] += answer.get("fluency", 0)
+                total_scores["accuracy"] += answer.get("accuracy", 0)  # Assuming "accuracy" is grammar
+                total_scores["completeness"] += answer.get("completeness", 0)
+                total_scores["pronunciation"] += answer.get("pronunciation", 0)
+        
+        if num_answers == 0:
+            return jsonify({"error": "No valid answers found for user"}), 404
+
+        # Calculate averages
+        averages = {
+            "fluency": total_scores["fluency"] / num_answers,
+            "accuracy": total_scores["accuracy"] / num_answers,
+            "completeness": total_scores["completeness"] / num_answers,
+            "pronunciation": total_scores["pronunciation"] / num_answers
+        }
+        
+
+        return jsonify({"averages": averages}), 200
+
+    except Exception as e:
+        return jsonify({"error": f"Error processing data: {str(e)}"}), 500
+@app.route('/get_i_score', methods=['POST'])
+def get_i_score():
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+
+        # Fetch user data from Firestore
+        user_doc = db.collection('scores').document(user_id).get()
+
+        if not user_doc.exists:
+            return jsonify({"error": "User data not found"}), 404
+
+        user_data = user_doc.to_dict()
+        i_score = user_data.get('i_score', 0) 
+        print(f"Searching for document ID: {user_id}")
+
+         # Default to 0 if not found
+        print('the score is:')
+        print(i_score)
+
+        return jsonify({"i_score": i_score}), 200
+
+    except Exception as e:
+        return jsonify({"error": f"Error fetching i_score: {str(e)}"}), 500
+       
 if __name__ == '__main__':
-    app.run(host='192.168.1.111', port=5000, debug=True)
+    app.run(host='172.17.41.194', port=5000, debug=True)

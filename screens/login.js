@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Image } from 'react-native';
+import { View, StyleSheet, Image, Alert } from 'react-native';
 import { Text, TextInput, Button, Card, IconButton } from 'react-native-paper';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; // Import Firebase Auth methods
 import '../firebaseConfig';
+import { getFirestore, doc, setDoc } from "firebase/firestore"; 
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -15,9 +16,24 @@ const LoginScreen = ({ navigation }) => {
       const user = userCredential.user; // Get the logged-in user
 
       console.log('Login successful:', user);
+      
+      const iScoreResponse = await fetch(`http://172.17.41.194:5000/get_i_score`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user_id: user.uid}),
+      });
 
+      const iScoreData = await iScoreResponse.json();
+      const iScore = iScoreData?.i_score ?? 0;
+
+      if(iScore!=0)
+      {
+        navigation.navigate('home', { userId: user.uid });
+      }
       // Navigate to the next screen after successful login and pass the userId
-      navigation.navigate('home', { userId: user.uid });
+      navigation.navigate('assessment_start', { userId: user.uid });
     } catch (error) {
       console.error('Login failed:', error.message);
       alert('Login failed: ' + error.message); // Display an error message to the user

@@ -5,12 +5,11 @@ import axios from "axios";
 import { getFirestore, doc, setDoc } from "firebase/firestore"; 
 import { getAuth } from "firebase/auth"; 
 import { useNavigation } from "@react-navigation/native"; 
-const auth = getAuth();
 
-const saveAnswer = async (selectedText, fluency, grammar, vocab, cohesion) => {
+
+const saveAnswer = async (selectedText, pronunciation, completeness, fluency, accuracy) => {
   const auth = getAuth();
-  const userId = auth.currentUser?.uid;
-
+const userId = auth.currentUser ? auth.currentUser.uid : null;
   if (userId) {
     const db = getFirestore();
     try {
@@ -18,9 +17,9 @@ const saveAnswer = async (selectedText, fluency, grammar, vocab, cohesion) => {
         answer3: {
           transcription: selectedText,
           fluency: fluency,
-          grammar: grammar,
-          vocabulary: vocab,
-          cohesion: cohesion
+          completeness: completeness,
+          pronunciation: pronunciation,
+          accuracy: accuracy
         }
       }, { merge: true });
       console.log("Answer and scores saved successfully!");
@@ -29,27 +28,20 @@ const saveAnswer = async (selectedText, fluency, grammar, vocab, cohesion) => {
     }
   } else {
     console.error("No user is logged in! Redirecting to login.");
+
   }
 };
-
-
-
-const calculateFluency = (transcription, durationInSeconds) => {
-  const wordCount = transcription.split(" ").length;
-  return wordCount / durationInSeconds;  // Fluency in words per second
-};
-
 
 const Question3Screen = () => {
   const [recording, setRecording] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
   const [transcription, setTranscription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [fluency, setFluency] = useState(null);
-  const [grammar, setGrammar] = useState(null);
-  const [vocab, setVocab] = useState(null);
-  const [cohesion, setCohesion] = useState(null);
   const [recognizedText, setRecognizedText] = useState("");
+    const [pronunciation, setpronunciation] = useState("");
+    const [accuracy, setaccuracy] = useState("");
+    const [fluency, setfluency] = useState("");
+    const [completeness, setcompleteness] = useState("");
 
   const navigation = useNavigation();
 
@@ -100,7 +92,7 @@ const startRecording = async () => {
            type: "audio/3gp", 
          });
      
-         const response = await fetch("http://192.168.1.111:5000/upload", {
+         const response = await fetch("http://172.17.41.194:5000/upload", {
            method: "POST",
            headers: {
              "Content-Type": "multipart/form-data",
@@ -116,8 +108,15 @@ const startRecording = async () => {
          if (data.recognized_text) {
            setRecognizedText(data.recognized_text);
          }
+         setpronunciation(data.pronunciation);
+        setcompleteness(data.completeness);
+        setfluency(data.fluency);
+        setaccuracy(data.accuracy);
+        
+        saveAnswer(data.recognized_text,data.pronunciation_score,data.completeness_score,data.fluency_score,data.accuracy_score);
+       
          setTimeout(() => {
-          navigation.navigate('q4');  // Replace 'q3a' with the correct screen name
+          navigation.navigate('q4');  
         }, 2000);
        } catch (error) {
          console.error("Error uploading audio:", error);

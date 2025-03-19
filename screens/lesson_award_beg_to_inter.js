@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image ,Alert} from 'react-native';
 import { getAuth } from 'firebase/auth'; 
 import { getFirestore, doc, setDoc } from "firebase/firestore"; 
 
@@ -9,7 +9,9 @@ const userId = auth.currentUser ? auth.currentUser.uid : null;
   if (userId) {
     const db = getFirestore();
     try {
-      await setDoc(doc(db, "scores", userId), { i_score: score }, { merge: true });
+      await setDoc(doc(db, "scores", userId), {
+        q_score:score
+      }, { merge: true });
       console.log("Answer and scores saved successfully!");
     } catch (error) {
       console.error("Error saving answer and scores: ", error);
@@ -20,7 +22,7 @@ const userId = auth.currentUser ? auth.currentUser.uid : null;
   }
 };
 
-const LevelScreen = ({ navigation }) => {
+const Lesson_award_beg_to_inter = ({ navigation }) => {
   const [userLevel, setUserLevel] = useState('');
   const [loading, setLoading] = useState(true);
   const auth = getAuth();
@@ -29,27 +31,43 @@ const LevelScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchUserScores = async () => {
       try {
-        const response = await fetch(`http://172.17.41.194:5000/calculate_average_scores`, {
+        // Fetch the user's average scores
+        const response = await fetch(`http://172.17.41.194:5000/calculate_average_lesson_scores`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ user_id: userId }),
         });
-
+  
         const data = await response.json();
         if (data?.averages) {
           const averages = data.averages;
           const overallScore = (averages.fluency + averages.pronunciation + averages.accuracy + averages.completeness) / 4;
           saveAnswer(overallScore);
-          console.log(overallScore);
-
-          if (overallScore >= 90) {
-            setUserLevel('Advanced');
-          } else if (overallScore <= 80 && overallScore >= 60) {
+  
+          // Fetch the i_score from Firestore
+          const iScoreResponse = await fetch(`http://172.17.41.194:5000/get_i_score`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id: userId }),
+          });
+  
+          const iScoreData = await iScoreResponse.json();
+          const iScore = iScoreData?.i_score ?? 0; // Default to 0 if undefined
+  
+          // Compare i_score with overallScore
+          if (iScore < overallScore) {
             setUserLevel('Moderate');
           } else {
             setUserLevel('Beginner');
+            Alert.alert(
+                'Level Status',
+                "Sorry, you couldn't improve the level. Try again from start!",
+                [{ text: 'OK', onPress: () => navigation.navigate('home') }]
+              );
           }
         } else {
           setUserLevel('No valid scores');
@@ -61,7 +79,7 @@ const LevelScreen = ({ navigation }) => {
         setLoading(false);
       }
     };
-
+  
     if (userId) {
       fetchUserScores();
     } else {
@@ -69,7 +87,7 @@ const LevelScreen = ({ navigation }) => {
       setLoading(false);
     }
   }, [userId]);
-
+  
   if (loading) {
     return (
       <View style={styles.container}>
@@ -77,6 +95,7 @@ const LevelScreen = ({ navigation }) => {
       </View>
     );
   }
+  
 
   return (
     <View style={styles.container}>
@@ -86,7 +105,7 @@ const LevelScreen = ({ navigation }) => {
         <Text style={styles.upperText}>Congratulations!</Text>
         <Image source={require('../assets/trophy.png')} style={styles.trophy} />
         <Text style={styles.lowerText}>
-          You are an <Text style={styles.highlight}>{userLevel}</Text> English Language Speaker!
+          You have become a <Text style={styles.highlight}>{userLevel}</Text> English Language Speaker!
         </Text>
       </View>
 
@@ -173,4 +192,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LevelScreen;
+export default Lesson_award_beg_to_inter;
