@@ -5,11 +5,12 @@ import numpy as np
 from firebase_admin import firestore,credentials, initialize_app
 import firebase_admin
 import ffmpeg
-
+import os
 app = Flask(__name__)
 
 # Initialize Firestore
-cred = credentials.Certificate("C:/Users/texon/Downloads/firebase-credentials.json")
+
+cred = credentials.Certificate(os.path.join(os.path.dirname(__file__), "firebase-credentials.json"))
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
