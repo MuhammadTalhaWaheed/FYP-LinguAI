@@ -5,6 +5,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import * as Speech from 'expo-speech';
 import { Audio } from 'expo-av';
 import axios from 'axios';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const L2_Chapter5Screen = ({ navigation }) => {
   const playAudio = (text) => {
@@ -404,8 +405,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: 'black',
       },
-  container: {
-    flexGrow: 1,
+      text: {
+        fontSize: wp('5%'), // Text scales with screen width
+      },
+      container: {   flexGrow: 1,
     padding: 25,
     backgroundColor: '#000',
     alignItems: 'center',

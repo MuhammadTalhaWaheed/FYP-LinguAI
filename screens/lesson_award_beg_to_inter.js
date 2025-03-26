@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image ,Alert} from 'react-native';
 import { getAuth } from 'firebase/auth'; 
 import { getFirestore, doc, setDoc } from "firebase/firestore"; 
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const saveAnswer = async (score) => {
   const auth = getAuth();
@@ -57,7 +58,7 @@ const Lesson_award_beg_to_inter = ({ navigation }) => {
   
           const iScoreData = await iScoreResponse.json();
           const iScore = iScoreData?.i_score ?? 0; // Default to 0 if undefined
-  
+          console.log(overallScore);
           // Compare i_score with overallScore
           if (iScore < overallScore) {
             setUserLevel('Moderate');
@@ -121,7 +122,12 @@ const Lesson_award_beg_to_inter = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+    text: {
+        fontSize: wp('5%'), // Text scales with screen width
+      },
+      container: {
+        width: wp('100%'),  // Takes 90% of screen width
+        height: hp('50%'),
     flex: 1,
     backgroundColor: 'black',
     padding: 20,

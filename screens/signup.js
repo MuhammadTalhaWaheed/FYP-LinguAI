@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Image, Alert } from 'react-native';
 import { Text, TextInput, Button, Card, IconButton } from 'react-native-paper';
 import { auth, createUserWithEmailAndPassword, updateProfile, db, ref, set } from '../firebaseConfig'; // Correct import
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const SignUpScreen = ({ navigation }) => {
   const [fullName, setFullName] = useState('');
@@ -103,7 +104,12 @@ const SignUpScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  text: {
+    fontSize: wp('5%'), // Text scales with screen width
+  },
   container: {
+    width: wp('100%'),  // Takes 90% of screen width
+    height: hp('50%'),
     flex: 1,
     alignItems: 'center',
     padding: 20,

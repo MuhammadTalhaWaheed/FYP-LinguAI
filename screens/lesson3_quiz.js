@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Speech from 'expo-speech';
-import { Audio } from 'expo-av';
 import { Picker } from '@react-native-picker/picker';
+import { getDatabase, ref, set } from 'firebase/database';  
+import { getAuth } from 'firebase/auth';
+import { Audio } from 'expo-av';
 import { getFirestore, doc, setDoc } from "firebase/firestore"; 
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const saveAnswer = async (selectedText, pronunciation, completeness, fluency, accuracy) => {
   const auth = getAuth();
@@ -30,6 +33,7 @@ const userId = auth.currentUser ? auth.currentUser.uid : null;
 
   }
 };
+
 const Lesson3_quiz = ({ navigation }) => {
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [fillBlankAnswer, setFillBlankAnswer] = useState('');
@@ -37,10 +41,11 @@ const Lesson3_quiz = ({ navigation }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [multipleChoiceAnswer, setMultipleChoiceAnswer] = useState('');
   const [recognizedText, setRecognizedText] = useState("");
-  const [pronunciation, setpronunciation] = useState("");
-      const [accuracy, setaccuracy] = useState("");
-      const [fluency, setfluency] = useState("");
-      const [completeness, setcompleteness] = useState("");
+  
+    const [pronunciation, setpronunciation] = useState("");
+    const [accuracy, setaccuracy] = useState("");
+    const [fluency, setfluency] = useState("");
+    const [completeness, setcompleteness] = useState("");
 
   const playAudio = (text) => {
     Speech.speak(text, {
@@ -50,95 +55,127 @@ const Lesson3_quiz = ({ navigation }) => {
     });
   };
 
-   const startRecording = async () => {
-       try {
-         const { status } = await Audio.requestPermissionsAsync();
-         if (status !== 'granted') {
-           Alert.alert("Permission Denied", "You need to grant audio permissions.");
-           return;
-         }
-     
-         const recording = new Audio.Recording();
-         await recording.prepareToRecordAsync(Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY);
-         await recording.startAsync();
-     
-         setRecording(recording);
-         setIsRecording(true);
-         console.log("Recording started...");
-       } catch (error) {
-         console.error("Error starting recording:", error);
-       }
-     };
-     
-     const stopRecording = async () => {
-       if (!recording) {
-         console.warn("No active recording found.");
-         return;
-       }
-     
-       try {
-         await recording.stopAndUnloadAsync();
-         const uri = recording.getURI();
-         console.log("Recording saved at:", uri);
-         setRecording(null);
-         setIsRecording(false);
-         sendAudioToBackend(uri);
-       } catch (error) {
-         console.error("Error stopping recording:", error);
-       }
-     };
-     
-     const sendAudioToBackend = async (uri) => {
-       try {
-         const formData = new FormData();
-         formData.append("audio", { 
-           uri: uri,
-           name: "recording3.3gp", 
-           type: "audio/3gp", 
-         });
-     
-         const response = await fetch("http://172.17.41.194:5000/upload", {
-           method: "POST",
-           headers: {
-             "Content-Type": "multipart/form-data",
-           },
-           body: formData,
-         });
-     
-         const text = await response.text();
-         console.log("Raw response:", text);
-     
-         const data = JSON.parse(text);
-         console.log("Parsed JSON:", data);
-         if (data.recognized_text) {
-           setRecognizedText(data.recognized_text);
-         }
-         setpronunciation(data.pronunciation);
-         setcompleteness(data.completeness);
-         setfluency(data.fluency);
-         setaccuracy(data.accuracy);
-         
-         saveAnswer(data.recognized_text,data.pronunciation_score,data.completeness_score,data.fluency_score,data.accuracy_score);
-         
-         Alert.alert("Success", "Audio file uploaded successfully!");
-       } catch (error) {
-         console.error("Error uploading audio:", error);
-         Alert.alert("Upload Failed", "Could not upload the audio file.");
-       }
-     };
 
-  const submitAssessment = () => {
-    Alert.alert('Assessment Submitted', 'Your answers have been recorded.');
+  const startRecording = async () => {
+    try {
+      const { status } = await Audio.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert("Permission Denied", "You need to grant audio permissions.");
+        return;
+      }
+  
+      const recording = new Audio.Recording();
+      await recording.prepareToRecordAsync(Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY);
+      await recording.startAsync();
+  
+      setRecording(recording);
+      setIsRecording(true);
+      console.log("Recording started...");
+    } catch (error) {
+      console.error("Error starting recording:", error);
+    }
+  };
+  
+  const stopRecording = async () => {
+    if (!recording) {
+      console.warn("No active recording found.");
+      return;
+    }
+  
+    try {
+      await recording.stopAndUnloadAsync();
+      const uri = recording.getURI();
+      console.log("Recording saved at:", uri);
+      setRecording(null);
+      setIsRecording(false);
+      sendAudioToBackend(uri);
+    } catch (error) {
+      console.error("Error stopping recording:", error);
+    }
+  };
+  
+  const sendAudioToBackend = async (uri) => {
+    try {
+      const formData = new FormData();
+      formData.append("audio", { // Change "file" to "audio"
+        uri: uri,
+        name: "recording.3gp", 
+        type: "audio/3gp", 
+      });
+  
+      const response = await fetch("http://172.17.41.194:5000/upload", {
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        body: formData,
+      });
+  
+      const text = await response.text();
+      console.log("Raw response:", text);
+  
+      const data = JSON.parse(text);
+      console.log("Parsed JSON:", data);
+      if (data.recognized_text) {
+        setRecognizedText(data.recognized_text);
+      }
+      setpronunciation(data.pronunciation);
+        setcompleteness(data.completeness);
+        setfluency(data.fluency);
+        setaccuracy(data.accuracy);
+        
+        saveAnswer(data.recognized_text,data.pronunciation_score,data.completeness_score,data.fluency_score,data.accuracy_score);
+        
+  
+      Alert.alert("Success", "Audio file uploaded successfully!");
+    } catch (error) {
+      console.error("Error uploading audio:", error);
+      Alert.alert("Upload Failed", "Could not upload the audio file.");
+    }
+  };
+  
+  const submitAssessment = async () => {
+    let score = 0;
+  
+    if (selectedAnswer === "sun") score += 1;
+    if (fillBlankAnswer.trim().toLowerCase() === "like") score += 1;
+    if (multipleChoiceAnswer === "B") score += 1;
+  
+    const auth = getAuth();
+    const user = auth.currentUser;
+  
+    if (!user) {
+      Alert.alert("Error", "You must be logged in to save your score.");
+      return;
+    }
+  
+    const db = getDatabase();
+    const userScoreRef = ref(db, `users/${user.uid}/user_lesson_3_score`);
+  
+    try {
+      await set(userScoreRef, score);
+      if(score==3)
+        
+      {
+        Alert.alert("Assessment Submitted");
+        navigation.navigate('lesson_award_beg_to_inter');
+      }
+      else Alert.alert("You couldn't pass the quiz. Try again!");
+
+    } catch (error) {
+      console.error("Error saving score:", error);
+      Alert.alert("Error", "Failed to save your score. Please try again.");
+    }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Lesson 1 Assessment</Text>
+      <Text style={styles.title}>Lesson 3 Assessment</Text>
 
       {/* Dropdown */}
       <View style={styles.section}>
-      <Text style={styles.question}>Match the phrase to situation:</Text>
-      <Text style={styles.prompt}>“It’s sunny” →</Text>
+      <Text style={styles.question}>Match the phrase to its meaning:</Text>
+      <Text style={styles.prompt}>'It’s sunny' refers to  →</Text>
 
         <View style={styles.dropdownContainer}>
           <Picker
@@ -147,9 +184,9 @@ const Lesson3_quiz = ({ navigation }) => {
             style={styles.picker}
           >
             <Picker.Item label="Select an answer" value="" />
-            <Picker.Item label="Talking about weather" value="weather" />
-            <Picker.Item label="Playing video games" value="games" />
-            <Picker.Item label="Asking about the taste of the food" value="food" />
+            <Picker.Item label="Night time" value="night" />
+            <Picker.Item label="Morning time with sunlight" value="sun" />
+            <Picker.Item label="Sleeping time" value="sleep" />
           </Picker>
         </View>
       </View>
@@ -169,18 +206,19 @@ const Lesson3_quiz = ({ navigation }) => {
       {/* Record Response */}
       <View style={styles.section}>
         <Text style={styles.question}>Record your response:</Text>
-        <Text style={styles.prompt}>“Talk about today's weather.”</Text>
+        <Text style={styles.prompt}>“Start a conversation and ask about the weather.”</Text>
         <TouchableOpacity
-          style={styles.recordButton}
-          onPress={isRecording ? stopRecording : startRecording}
-        >
-          <MaterialCommunityIcons name={isRecording ? 'stop-circle' : 'microphone'} size={24} color='white' />
-          <Text style={styles.recordButtonText}>{isRecording ? 'Stop Recording' : 'Start Recording'}</Text>
-        </TouchableOpacity>
-        <View style={styles.section}>
-          <Text style={styles.question}>Recognized Text:</Text>
-          <Text style={styles.recognizedText}>{recognizedText || "No text recognized yet"}</Text>
-        </View>
+  style={styles.recordButton}
+  onPress={isRecording ? stopRecording : startRecording}
+>
+  <MaterialCommunityIcons name={isRecording ? 'stop-circle' : 'microphone'} size={24} color='white' />
+  <Text style={styles.recordButtonText}>{isRecording ? 'Stop Recording' : 'Start Recording'}</Text>
+</TouchableOpacity>
+<View style={styles.section}>
+  <Text style={styles.question}>Recognized Text:</Text>
+  <Text style={styles.recognizedText}>{recognizedText || "No text recognized yet"}</Text>
+</View>
+
       </View>
 
       {/* Multiple Choice */}
@@ -202,7 +240,7 @@ const Lesson3_quiz = ({ navigation }) => {
           style={[styles.option, multipleChoiceAnswer === 'C' && styles.selectedOption]}
           onPress={() => setMultipleChoiceAnswer('C')}
         >
-          <Text style={styles.optionText}>C) I like coffee.</Text>
+          <Text style={styles.optionText}>C) I Like coffee</Text>
         </TouchableOpacity>
       </View>
 
@@ -222,6 +260,10 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginTop: 5,
+  },
+  
+  text: {
+    fontSize: wp('5%'), // Text scales with screen width
   },
   container: {
     flexGrow: 1,

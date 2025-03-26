@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput,ScrollView, Image, Alert, Modal, Button } from 'react-native';
 import { WebView } from 'react-native-webview';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Speech from 'expo-speech';
@@ -190,7 +191,7 @@ const L3_Chapter5Screen = ({ navigation }) => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>✖</Text> {/* Cross icon */}
+            <Text style={styles.closeButtonText}>✖</Text> 
             </TouchableOpacity>
 
             <TextInput
@@ -269,7 +270,7 @@ const L3_Chapter5Screen = ({ navigation }) => {
 
 
       <TouchableOpacity style={styles.nextButton} onPress={() => navigation.navigate('lesson3_quiz')}>
-        <Text style={styles.nextButtonText}>Next Chapter →</Text>
+        <Text style={styles.nextButtonText}>Go to Assessment →</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -399,7 +400,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: 'black',
       },
-  container: {
+      text: {
+        fontSize: wp('5%'), // Text scales with screen width
+      },
+      container: {
     flexGrow: 1,
     padding: 25,
     backgroundColor: '#000',

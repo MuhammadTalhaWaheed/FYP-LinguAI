@@ -3,7 +3,7 @@ import { View, StyleSheet, Image, Alert } from 'react-native';
 import { Text, TextInput, Button, Card, IconButton } from 'react-native-paper';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; // Import Firebase Auth methods
 import '../firebaseConfig';
-import { getFirestore, doc, setDoc } from "firebase/firestore"; 
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -28,17 +28,18 @@ const LoginScreen = ({ navigation }) => {
       const iScoreData = await iScoreResponse.json();
       const iScore = iScoreData?.i_score ?? 0;
 
-      if(iScore!=0)
-      {
+      if (iScore !== 0) {
         navigation.navigate('home', { userId: user.uid });
+      } else {
+        navigation.navigate('assessment_start', { userId: user.uid });
       }
-      // Navigate to the next screen after successful login and pass the userId
-      navigation.navigate('assessment_start', { userId: user.uid });
+      
     } catch (error) {
       console.error('Login failed:', error.message);
       alert('Login failed: ' + error.message); // Display an error message to the user
     }
-  };
+};
+
 
   return (
     <View style={styles.container}>
@@ -95,7 +96,12 @@ const LoginScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  text: {
+    fontSize: wp('5%'), // Text scales with screen width
+  },
   container: {
+    width: wp('100%'),  // Takes 90% of screen width
+    height: hp('50%'),
     flex: 1,
     alignItems: 'center',
     padding: 20,

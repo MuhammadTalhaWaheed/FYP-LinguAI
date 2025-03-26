@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';  // Import the icon library
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const HomeScreen = ({ navigation }) => {
   return (
@@ -34,7 +35,7 @@ const HomeScreen = ({ navigation }) => {
         mode="contained"
         icon={() => <MaterialCommunityIcons name="chart-line" size={24} color="red" />}
         style={styles.button}
-        onPress={() => navigation.navigate('Progress')}
+        onPress={() => navigation.navigate('progress')}
       >
         TRACK YOUR PROGRESS
       </Button>
@@ -52,7 +53,12 @@ const HomeScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  text: {
+    fontSize: wp('5%'), // Text scales with screen width
+  },
   container: {
+    width: wp('100%'),  // Takes 90% of screen width
+    height: hp('50%'),
     flex: 1,
     alignItems: 'center',
     padding: 20,

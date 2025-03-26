@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { getAuth } from 'firebase/auth'; 
 import { getFirestore, doc, setDoc } from "firebase/firestore"; 
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const saveAnswer = async (score) => {
   const auth = getAuth();
-const userId = auth.currentUser ? auth.currentUser.uid : null;
+  const userId = auth.currentUser ? auth.currentUser.uid : null;
+  
   if (userId) {
     const db = getFirestore();
     try {
@@ -16,7 +18,6 @@ const userId = auth.currentUser ? auth.currentUser.uid : null;
     }
   } else {
     console.error("No user is logged in! Redirecting to login.");
-
   }
 };
 
@@ -46,8 +47,8 @@ const LevelScreen = ({ navigation }) => {
 
           if (overallScore >= 90) {
             setUserLevel('Advanced');
-          } else if (overallScore <= 80 && overallScore >= 60) {
-            setUserLevel('Moderate');
+          } else if (overallScore <= 90 && overallScore >= 80) {
+            setUserLevel('Intermediate');
           } else {
             setUserLevel('Beginner');
           }
@@ -81,28 +82,40 @@ const LevelScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Image source={require('../assets/logo.png')} style={styles.logo} />
-
+  
       <View style={styles.contentContainer}>
         <Text style={styles.upperText}>Congratulations!</Text>
         <Image source={require('../assets/trophy.png')} style={styles.trophy} />
         <Text style={styles.lowerText}>
-          You are an <Text style={styles.highlight}>{userLevel}</Text> English Language Speaker!
+          You are a <Text style={styles.highlight}>{userLevel}</Text> English Language Speaker!
         </Text>
       </View>
-
-      <TouchableOpacity
-        style={styles.startButton}
-        onPress={() => navigation.navigate('home')}
-      >
-        <Text style={styles.buttonText}>Start your Career</Text>
-        <Text style={styles.arrow}>→</Text>
-      </TouchableOpacity>
+  
+      {userLevel === 'Beginner' ? (
+        <TouchableOpacity
+          style={styles.startButton}
+          onPress={() => navigation.navigate('home')}
+        >
+          <Text style={styles.buttonText}>Start your Career</Text>
+          <Text style={styles.arrow}>→</Text>
+        </TouchableOpacity>
+      ) : (
+        <Text style={styles.warningText}>
+          Sorry, currently we are teaching beginner-level students only.
+        </Text>
+      )}
     </View>
   );
+  
 };
 
 const styles = StyleSheet.create({
+  text: {
+    fontSize: wp('5%'), // Text scales with screen width
+  },
   container: {
+    width: wp('100%'),  // Takes 90% of screen width
+    height: hp('50%'),
     flex: 1,
     backgroundColor: 'black',
     padding: 20,
@@ -143,7 +156,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 30,
     marginBottom: 40,
-    marginLeft:20,
+    marginLeft: 20,
     marginTop: 40,
     width: 300,
   },
@@ -157,6 +170,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 20,
     fontWeight: '600',
+  },
+  warningText: {
+    color: 'red',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 20,
   },
   logo: {
     width: 250,

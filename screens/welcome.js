@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { Text, Button } from 'react-native-paper';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const WelcomeScreen = ({ navigation }) => {
   return (
@@ -35,7 +36,12 @@ const WelcomeScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  text: {
+    fontSize: wp('5%'), // Text scales with screen width
+  },
   container: {
+    width: wp('100%'),  // Takes 90% of screen width
+    height: hp('50%'),
     flex: 1,
     alignItems: 'center',
     padding: 20,

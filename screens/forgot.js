@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { Text, TextInput, Button, Card, IconButton } from 'react-native-paper';
 import { getAuth, sendPasswordResetEmail } from 'firebase/auth'; // Import only Firebase Auth
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const ForgotPassword = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -75,8 +76,12 @@ const ForgotPassword = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  text: {
+    fontSize: wp('5%'), // Text scales with screen width
+  },
   container: {
-    flex: 1,
+    width: wp('100%'),  // Takes 90% of screen width
+    height: hp('50%'),    flex: 1,
     alignItems: 'center',
     padding: 20,
     backgroundColor: 'black',

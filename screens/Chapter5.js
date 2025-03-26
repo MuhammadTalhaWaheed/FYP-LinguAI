@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput,ScrollView, Image, Alert, Modal, Button } from 'react-native';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Speech from 'expo-speech';
@@ -404,8 +405,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: 'black',
       },
-  container: {
-    flexGrow: 1,
+      text: {
+        fontSize: wp('5%'), // Text scales with screen width
+      },
+      container: {  flexGrow: 1,
     padding: 25,
     backgroundColor: '#000',
     alignItems: 'center',

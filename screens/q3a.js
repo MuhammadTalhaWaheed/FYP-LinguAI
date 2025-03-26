@@ -5,6 +5,7 @@ import axios from "axios";
 import { getFirestore, doc, setDoc } from "firebase/firestore"; 
 import { getAuth } from "firebase/auth"; 
 import { useNavigation } from "@react-navigation/native"; 
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 
 const saveAnswer = async (selectedText, pronunciation, completeness, fluency, accuracy) => {
@@ -188,8 +189,12 @@ const startRecording = async () => {
 };
 
 const styles = StyleSheet.create({
+  text: {
+    fontSize: wp('5%'), // Text scales with screen width
+  },
   container: {
-    flex: 1,
+    width: wp('100%'),  // Takes 90% of screen width
+    height: hp('50%'),    flex: 1,
     backgroundColor: "#000",
     padding: 20,
   },

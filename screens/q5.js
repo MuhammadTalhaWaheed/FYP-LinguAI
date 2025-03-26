@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, Image } from 'react-native';
 import { getFirestore, doc, setDoc } from 'firebase/firestore'; // Firestore methods
 import { getAuth } from 'firebase/auth'; // Firebase Auth
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+
 const auth = getAuth();
 
 const Question5Screen = ({ navigation }) => {
@@ -132,7 +134,12 @@ const Question5Screen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  text: {
+    fontSize: wp('5%'), // Text scales with screen width
+  },
   container: {
+    width: wp('100%'),  // Takes 90% of screen width
+    height: hp('50%'),
     flex: 1,
     backgroundColor: 'black',
     padding: 20,

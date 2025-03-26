@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated, Easing, Image } from 'react-native';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const LoadingSpinner = () => {
   const spinValue = useRef(new Animated.Value(0)).current;
@@ -89,8 +90,12 @@ const AssessmentEndScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  text: {
+    fontSize: wp('5%'), // Text scales with screen width
+  },
   container: {
-    flex: 1,
+    width: wp('100%'),  // Takes 90% of screen width
+    height: hp('50%'),    flex: 1,
     backgroundColor: '#000',
     padding: 20,
     alignItems: 'center',

@@ -7,6 +7,7 @@ import { getDatabase, ref, set } from 'firebase/database';
 import { getAuth } from 'firebase/auth';
 import { Audio } from 'expo-av';
 import { getFirestore, doc, setDoc } from "firebase/firestore"; 
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const saveAnswer = async (selectedText, pronunciation, completeness, fluency, accuracy) => {
   const auth = getAuth();
@@ -153,7 +154,14 @@ const Lesson1_quiz = ({ navigation }) => {
   
     try {
       await set(userScoreRef, score);
-      Alert.alert("Assessment Submitted", `Your score is: ${score}/3 and saved successfully.`);
+      if(score==3)
+        
+      {
+        Alert.alert("Assessment Submitted");
+        navigation.navigate('l2_chapter1');
+      }
+      else Alert.alert("You couldn't pass the quiz. Try again!");
+
     } catch (error) {
       console.error("Error saving score:", error);
       Alert.alert("Error", "Failed to save your score. Please try again.");
@@ -254,6 +262,9 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   
+  text: {
+    fontSize: wp('5%'), // Text scales with screen width
+  },
   container: {
     flexGrow: 1,
     paddingHorizontal: 20,

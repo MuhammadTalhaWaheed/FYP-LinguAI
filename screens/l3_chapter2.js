@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput,ScrollView, Image, Alert, Modal, Button } from 'react-native';
 import { WebView } from 'react-native-webview';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Speech from 'expo-speech';
@@ -268,7 +269,7 @@ const L3_Chapter2Screen = ({ navigation }) => {
       </View>
 
 
-      <TouchableOpacity style={styles.nextButton} onPress={() => navigation.navigate('L3_chapter3')}>
+      <TouchableOpacity style={styles.nextButton} onPress={() => navigation.navigate('l3_chapter3')}>
         <Text style={styles.nextButtonText}>Next Chapter →</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -399,7 +400,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: 'black',
       },
-  container: {
+      text: {
+        fontSize: wp('5%'), // Text scales with screen width
+      },
+      container: {
     flexGrow: 1,
     padding: 25,
     backgroundColor: '#000',

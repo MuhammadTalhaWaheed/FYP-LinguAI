@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const AssessmentStartScreen = ({ navigation, route }) => {
   // Retrieve the userId passed from the previous screen
@@ -34,8 +35,12 @@ const AssessmentStartScreen = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
+  text: {
+    fontSize: wp('5%'), // Text scales with screen width
+  },
   container: {
-    flex: 1,
+    width: wp('100%'),  // Takes 90% of screen width
+    height: hp('50%'),    flex: 1,
     backgroundColor: 'black',
     padding: 20,
   },

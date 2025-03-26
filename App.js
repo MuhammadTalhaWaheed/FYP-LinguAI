@@ -44,6 +44,7 @@ import l3_Chapter2Screen from './screens/l3_chapter2';
 import l3_Chapter3Screen from './screens/l3_chapter3';
 import l3_Chapter4Screen from './screens/l3_chapter4';
 import l3_Chapter5Screen from './screens/l3_chapter5';
+import QuizResults from './screens/progress';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAz5l_N81gYP4uh9gJBU0VxL5KfUrT-GbQ",
@@ -104,6 +105,7 @@ export default function App() {
 
         <Stack.Screen name='Lesson_award_beg_to_inter' component={Lesson_award_beg_to_inter}/>
 
+        <Stack.Screen name='progress' component={QuizResults}/>
 
 
       </Stack.Navigator>

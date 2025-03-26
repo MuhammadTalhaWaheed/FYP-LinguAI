@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const L3_ChapterScreen = ({ navigation }) => {
   const chapters = [
@@ -46,8 +47,12 @@ const L3_ChapterScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  text: {
+    fontSize: wp('5%'), // Text scales with screen width
+  },
   container: {
-    flex: 1,
+    width: wp('100%'),  // Takes 90% of screen width
+    height: hp('50%'),    flex: 1,
     padding: 20,
     backgroundColor: '#000',
     alignItems: 'center',
