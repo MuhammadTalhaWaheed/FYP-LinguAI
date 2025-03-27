@@ -9,9 +9,12 @@ import os
 app = Flask(__name__)
 
 # Initialize Firestore
+import json
 
-cred = credentials.Certificate(os.path.join(os.path.dirname(__file__), "firebase-credentials.json"))
+firebase_credentials = json.loads(os.getenv("FIREBASE_CREDENTIALS"))
+cred = credentials.Certificate(firebase_credentials)
 firebase_admin.initialize_app(cred)
+
 db = firestore.client()
 
 # Load model and tokenizer
@@ -23,10 +26,10 @@ import os
 import azure.cognitiveservices.speech as speechsdk
 from werkzeug.utils import secure_filename
 
-SPEECH_KEY = "2WqE0STm4J40xVUlUvxBQqnqU9c0mCN20t4pZTOEUiAjVh3XhVEKJQQJ99BCACYeBjFXJ3w3AAAYACOGpmj7"  # Replace with your actual key
-SERVICE_REGION = "eastus"
+SPEECH_KEY = os.getenv("AZURE_SPEECH_KEY")
+SERVICE_REGION = os.getenv("AZURE_SPEECH_REGION")
 
-UPLOAD_FOLDER = "uploads"
+UPLOAD_FOLDER = "/tmp/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
@@ -58,7 +61,7 @@ import os
 import ffmpeg
 
 def convert_to_wav(input_path):
-    output_dir = "E:/my-app/temp_audio"
+    output_dir = "/tmp/temp_audio"
     os.makedirs(output_dir, exist_ok=True)  # Ensure the directory exists
 
     # Get the base filename without extension
