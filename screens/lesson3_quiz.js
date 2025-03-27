@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Speech from 'expo-speech';
 import { Picker } from '@react-native-picker/picker';
-import { getDatabase, ref, set } from 'firebase/database';  
+import { getDatabase, ref, set ,push} from 'firebase/database';  
 import { getAuth } from 'firebase/auth';
 import { Audio } from 'expo-av';
 import { getFirestore, doc, setDoc } from "firebase/firestore"; 
@@ -103,7 +103,7 @@ const Lesson3_quiz = ({ navigation }) => {
         type: "audio/3gp", 
       });
   
-      const response = await fetch("http://172.17.41.194:5000/upload", {
+      const response = await fetch("https://fyp-linguai.onrender.com/upload", {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
@@ -152,21 +152,45 @@ const Lesson3_quiz = ({ navigation }) => {
     const db = getDatabase();
     const userScoreRef = ref(db, `users/${user.uid}/user_lesson_3_score`);
   
+      const achievementsRef = ref(db, `users/${user.uid}/achievements`);
+      const progressRef = ref(db, `users/${user.uid}/progress`);
     try {
-      await set(userScoreRef, score);
-      if(score==3)
-        
-      {
-        Alert.alert("Assessment Submitted");
-        navigation.navigate('lesson_award_beg_to_inter');
-      }
-      else Alert.alert("You couldn't pass the quiz. Try again!");
-
-    } catch (error) {
-      console.error("Error saving score:", error);
-      Alert.alert("Error", "Failed to save your score. Please try again.");
-    }
-  };
+         await set(userScoreRef, score);
+         let feedback = '';
+         if (score === 3) {
+           feedback = 'Excellent work! You aced Lesson 3.';
+           Alert.alert("Assessment Submitted");
+           navigation.navigate('lesson_award_beg_to_inter');
+         }else{
+           feedback = 'Keep trying! Review Lesson 3 and try again.';
+           Alert.alert("You couldn't pass the quiz. Try again!");
+         }
+         const progress = {
+           lesson: 'Lesson 3',
+           score: score,
+           feedback: feedback,
+           date: new Date().toISOString(),
+           badgeUrl: '../assets/logo.png',
+         };
+         const newProgressRef = ref(db, `users/${user.uid}/progress`);
+         await push(newProgressRef, progress);
+         if (score ==3) {
+           const newAchievement = {
+             title: "Lesson 3 Passed",
+             description: "You successfully passed Lesson 3!",
+             date: new Date().toISOString(),
+             badgeUrl: '../assets/logo.png',
+           };
+           const newAchievementRef = ref(db, `users/${user.uid}/achievements`);
+           await push(newAchievementRef, newAchievement);
+         }
+   
+       } catch (error) {
+         console.error("Error saving score:", error);
+         Alert.alert("Error", "Failed to save your score. Please try again.");
+       }
+     };
+   
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

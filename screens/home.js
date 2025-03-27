@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { Text, Button } from 'react-native-paper';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';  // Import the icon library
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';  
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const HomeScreen = ({ navigation }) => {
@@ -35,7 +35,7 @@ const HomeScreen = ({ navigation }) => {
         mode="contained"
         icon={() => <MaterialCommunityIcons name="chart-line" size={24} color="red" />}
         style={styles.button}
-        onPress={() => navigation.navigate('progress')}
+        onPress={() => navigation.navigate('TrackYourProgress')}
       >
         TRACK YOUR PROGRESS
       </Button>
@@ -44,7 +44,7 @@ const HomeScreen = ({ navigation }) => {
         mode="contained"
         icon={() => <MaterialCommunityIcons name="trophy" size={24} color="yellow" />}
         style={styles.button}
-        onPress={() => navigation.navigate('Achievements')}
+        onPress={() => navigation.navigate('AchievementsAndAwards')}
       >
         ACHIEVEMENTS AND AWARDS
       </Button>

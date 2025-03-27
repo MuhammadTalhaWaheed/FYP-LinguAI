@@ -96,7 +96,7 @@ const Question1Screen = () => {
           type: "audio/3gp", 
         });
     
-        const response = await fetch("http://172.17.41.194:5000/upload", {
+        const response = await fetch("https://fyp-linguai.onrender.com/upload", {
           method: "POST",
           headers: {
             "Content-Type": "multipart/form-data",

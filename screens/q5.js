@@ -20,7 +20,7 @@ const Question5Screen = ({ navigation }) => {
     const questionNumber = 5;
 
     try {
-      const response = await fetch("http://172.17.41.194:5000/predict", {
+      const response = await fetch("https://fyp-linguai.onrender.com/predict", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

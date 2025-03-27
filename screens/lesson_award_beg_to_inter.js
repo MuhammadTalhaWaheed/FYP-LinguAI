@@ -33,7 +33,7 @@ const Lesson_award_beg_to_inter = ({ navigation }) => {
     const fetchUserScores = async () => {
       try {
         // Fetch the user's average scores
-        const response = await fetch(`http://172.17.41.194:5000/calculate_average_lesson_scores`, {
+        const response = await fetch(`https://fyp-linguai.onrender.com/calculate_average_lesson_scores`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ const Lesson_award_beg_to_inter = ({ navigation }) => {
           saveAnswer(overallScore);
   
           // Fetch the i_score from Firestore
-          const iScoreResponse = await fetch(`http://172.17.41.194:5000/get_i_score`, {
+          const iScoreResponse = await fetch(`https://fyp-linguai.onrender.com/get_i_score`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

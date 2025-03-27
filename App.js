@@ -38,6 +38,10 @@ import l2_Chapter5Screen from './screens/l2_chapter5';
 import Lesson2_quiz from './screens/lesson2_quiz';
 import Lesson3_quiz from './screens/lesson3_quiz';
 
+import AchievementsAndAwards from './screens/AchievementsAndAwards';
+import PersonalInfo from './screens/PersonalInfo';
+import TrackYourProgress from './screens/TrackYourProgress';
+
 import Lesson_award_beg_to_inter from './screens/lesson_award_beg_to_inter';
 import l3_Chapter1Screen from './screens/l3_chapter1';
 import l3_Chapter2Screen from './screens/l3_chapter2';
@@ -106,6 +110,9 @@ export default function App() {
         <Stack.Screen name='Lesson_award_beg_to_inter' component={Lesson_award_beg_to_inter}/>
 
         <Stack.Screen name='progress' component={QuizResults}/>
+        <Stack.Screen name='AchievementsAndAwards' component={AchievementsAndAwards}/>
+        <Stack.Screen name='PersonalInfo' component={PersonalInfo}/>
+        <Stack.Screen name='TrackYourProgress' component={TrackYourProgress}/>
 
 
       </Stack.Navigator>

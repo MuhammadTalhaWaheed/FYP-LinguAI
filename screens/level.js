@@ -30,7 +30,7 @@ const LevelScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchUserScores = async () => {
       try {
-        const response = await fetch(`http://172.17.41.194:5000/calculate_average_scores`, {
+        const response = await fetch(`https://fyp-linguai.onrender.com/calculate_average_scores`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

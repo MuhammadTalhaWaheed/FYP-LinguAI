@@ -17,7 +17,7 @@ const LoginScreen = ({ navigation }) => {
 
       console.log('Login successful:', user);
       
-      const iScoreResponse = await fetch(`http://172.17.41.194:5000/get_i_score`, {
+      const iScoreResponse = await fetch(`https://fyp-linguai.onrender.com/get_i_score`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
