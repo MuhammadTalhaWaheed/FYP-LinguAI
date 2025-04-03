@@ -1,27 +1,27 @@
 workflows:
-  ios_release:
-    name: iOS Release Workflow
+  default:
+    name: Build and Deploy Android AAB
+    max_build_duration: 60  # Optional: define a max build time (in minutes)
     scripts:
       - name: Install dependencies
         script: |
           npm install
-          cd ios && pod install # Ensure CocoaPods dependencies are installed
-      - name: Build iOS
-        script: |
-          npx react-native run-ios --configuration Release # Build iOS app
-    artifacts:
-      - build/ios/*.ipa # Path to the generated IPA file
+          npx jetify  # Ensure Android dependencies are compatible
 
-  android_release:
-    name: Android Release Workflow
-    scripts:
-      - name: Install dependencies
+      - name: Make gradlew executable
         script: |
-          npm install
-          cd android && ./gradlew clean # Clean previous builds (if necessary)
-      - name: Build APK/AAB
+          chmod +x android/gradlew  # Grant permission to gradlew script
+
+      - name: Build AAB
         script: |
-          cd android && ./gradlew assembleRelease # Build APK/AAB
+          cd android
+          ./gradlew clean
+          ./gradlew bundleRelease  # Builds the AAB file
+
+      - name: Upload AAB as Artifact
+        script: |
+          mkdir -p $CM_BUILD_DIR/aab_output
+          cp android/app/build/outputs/bundle/release/app-release.aab $CM_BUILD_DIR/aab_output/
+
     artifacts:
-      - build/android/app/build/outputs/bundle/release/*.aab # Path to the generated AAB file
-      - build/android/app/build/outputs/apk/release/*.apk # Path to the generated APK file
+      - aab_output/*  # Ensure the AAB file is uploaded as an artifact
