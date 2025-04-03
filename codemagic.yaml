@@ -1,9 +1,6 @@
 workflows:
   ios_release:
     name: iOS Release Workflow
-    # Trigger build on push to main branch
-    triggers:
-      - branch: main
     scripts:
       - name: Install dependencies
         script: |
@@ -17,9 +14,6 @@ workflows:
 
   android_release:
     name: Android Release Workflow
-    # Trigger build on push to main branch
-    triggers:
-      - branch: main
     scripts:
       - name: Install dependencies
         script: |
