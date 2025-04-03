@@ -6,6 +6,7 @@ workflows:
       - name: Install dependencies
         script: |
           npm install
+          npm install jetifier  # Make sure jetifier is installed before using it
           npx jetify  # Ensure Android dependencies are compatible
 
       - name: Make gradlew executable
