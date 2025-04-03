@@ -7,6 +7,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 const auth = getAuth();
 
 const Question5Screen = ({ navigation }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [answer, setAnswer] = useState('');
   const [grammar, setGrammar] = useState(null);
   const [vocab, setVocab] = useState(null);
@@ -16,16 +17,14 @@ const Question5Screen = ({ navigation }) => {
     setAnswer(text);
   };
   const sendTranscriptionToBackend = async (transcription) => {
-    const userId = auth.currentUser?.uid;  // Make sure this is properly set
+    const userId = auth.currentUser?.uid;  
     const questionNumber = 5;
-
+  
     try {
       const response = await fetch("https://fyp-linguai.onrender.com/predict", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ transcription,user_id: userId ,question_number: questionNumber}),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transcription, user_id: userId, question_number: questionNumber }),
       });
   
       const data = await response.json(); // Parse JSON response
@@ -33,22 +32,47 @@ const Question5Screen = ({ navigation }) => {
   
       // Update state with parsed data
       setGrammar(data.grammar);
-      setVocab(data.vocabulary); // Ensure this matches the backend key
+      setVocab(data.vocabulary);
       setCohesion(data.cohesion);
-      
+  
+      return data; // Return data so it can be used in handleSubmit
     } catch (error) {
       console.error("Error during API call:", error);
+      return null;
     }
   };
+  
   const handleSubmit = async () => {
-    await sendTranscriptionToBackend(answer);
-
-   // await saveAnswer(answer,grammar, vocab, cohesion);
-
-    // Navigate to the assessment end screen
-    navigation.navigate('assessment_end'); 
+    console.log('button pressed');
+    if (isSubmitting) return; // Prevent multiple calls
+    setIsSubmitting(true);
+  
+    if (!answer.trim()) {
+      console.error("Answer cannot be empty.");
+      setIsSubmitting(false);
+      return;
+    }
+  
+    try {
+      const response = await sendTranscriptionToBackend(answer);
+      
+      if (response) {
+        await saveAnswer(answer, response.grammar, response.vocabulary, response.cohesion);
+        console.log("🚀 Navigating to assessment_end...");
+        navigation.navigate("assessment_end");
+      } else {
+        console.error("API call failed, retrying is disabled.");
+      }
+    } catch (error) {
+      console.error("Error in submission:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-
+  
+  
+  
+  
   const saveAnswer = async (textAnswer,grammar, vocab, cohesion) => {
     const auth = getAuth(); // Get the current user
     const userId = auth.currentUser?.uid; // Get the user ID (ensure the user is logged in)
@@ -125,10 +149,16 @@ const Question5Screen = ({ navigation }) => {
           maxLength={500}
         />
       </View>
+      <TouchableOpacity 
+   style={[styles.submitButton, isSubmitting && { opacity: 0.6 }]} 
+   onPress={handleSubmit} 
+   disabled={isSubmitting}
+ >
+   <Text style={styles.submitButtonText}>
+     {isSubmitting ? "Submitting..." : "Submit"}
+   </Text>
+ </TouchableOpacity>
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>Submit</Text>
-      </TouchableOpacity>
     </KeyboardAvoidingView>
   );
 };
@@ -138,8 +168,6 @@ const styles = StyleSheet.create({
     fontSize: wp('5%'), // Text scales with screen width
   },
   container: {
-    width: wp('100%'),  // Takes 90% of screen width
-    height: hp('50%'),
     flex: 1,
     backgroundColor: 'black',
     padding: 20,

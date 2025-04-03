@@ -122,16 +122,21 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image } from 'react-native';
 import { getDatabase, ref, get } from 'firebase/database';
-import { useAuth } from './AuthContext';
+import { getAuth } from 'firebase/auth';
 
 const TrackYourProgress = () => {
-  const { user } = useAuth();
+
+  const auth = getAuth();
+  const user = auth.currentUser;   
   const [progress, setProgress] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchProgressData = async () => {
-      setLoading(true);
+    if (!user?.uid) {
+      console.warn('No user logged in.');
+      return;
+    }
       try {
         const db = getDatabase();
         const progressRef = ref(db, `users/${user.uid}/progress`);

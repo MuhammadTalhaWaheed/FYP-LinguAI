@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { Text, Button, Card } from 'react-native-paper';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'; // Import icons
-import { useAuth } from '../screens/AuthContext'; // Import Auth Context
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { getAuth } from 'firebase/auth';
 
 const PersonalInfo = ({ navigation }) => {
-  const { user } = useAuth(); // Get user data from context
+  const auth = getAuth();
+  const user = auth.currentUser; // Get the logged-in user
 
   if (!user) {
     return (
@@ -27,7 +28,7 @@ const PersonalInfo = ({ navigation }) => {
         <Card.Content>
           <View style={styles.infoRow}>
             <MaterialCommunityIcons name="account" size={24} color="white" />
-            <Text style={styles.infoText}>{user.displayName}</Text>
+            <Text style={styles.infoText}>{user.displayName || 'No Name Available'}</Text>
           </View>
 
           <View style={styles.infoRow}>
@@ -37,21 +38,12 @@ const PersonalInfo = ({ navigation }) => {
         </Card.Content>
       </Card>
 
-      {/* Buttons */}
-      {/* <Button
-        mode="contained"
-        icon={() => <MaterialCommunityIcons name="pencil" size={24} color="white" />}
-        style={styles.button}
-        onPress={() => navigation.navigate('EditProfile')}
-      >
-        EDIT PROFILE
-      </Button> */}
-
+      {/* Back to Home Button */}
       <Button
         mode="contained"
         icon={() => <MaterialCommunityIcons name="home" size={24} color="white" />}
         style={styles.button}
-        onPress={() => navigation.navigate('home')}
+        onPress={() => navigation.navigate('home')} // Ensure 'Home' matches your navigation route
       >
         BACK TO HOME
       </Button>
@@ -99,6 +91,12 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     backgroundColor: '#0056d2',
     borderRadius: 10,
+  },
+  text: {
+    color: 'white',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 

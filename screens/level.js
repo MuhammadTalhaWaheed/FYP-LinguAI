@@ -39,17 +39,23 @@ const LevelScreen = ({ navigation }) => {
         });
 
         const data = await response.json();
+        console.log(data);
         if (data?.averages) {
           const averages = data.averages;
           const overallScore = (averages.fluency + averages.pronunciation + averages.accuracy + averages.completeness) / 4;
-          saveAnswer(overallScore);
           console.log(overallScore);
 
-          if (overallScore >= 90) {
+          if (overallScore >= 98) {
             setUserLevel('Advanced');
-          } else if (overallScore <= 90 && overallScore >= 80) {
+            saveAnswer(0);
+
+          } else if (overallScore <= 97 && overallScore >= 95) {
+            saveAnswer(0);
+
             setUserLevel('Intermediate');
           } else {
+            saveAnswer(overallScore);
+
             setUserLevel('Beginner');
           }
         } else {
@@ -94,18 +100,25 @@ const LevelScreen = ({ navigation }) => {
       {userLevel === 'Beginner' ? (
         <TouchableOpacity
           style={styles.startButton}
-          onPress={() => navigation.navigate('home')}
+          onPress={() => navigation.navigate('welcome')} // Change 'home' to 'welcome'
         >
-          <Text style={styles.buttonText}>Start your Career</Text>
+          <Text style={styles.buttonText}>Go to Welcome Screen</Text>
           <Text style={styles.arrow}>→</Text>
         </TouchableOpacity>
       ) : (
-        <Text style={styles.warningText}>
-          Sorry, currently we are teaching beginner-level students only.
-        </Text>
+        <TouchableOpacity
+          style={styles.startButton}
+          onPress={() => navigation.navigate('welcome')}
+        >
+          <Text style={styles.buttonText}>Go back</Text>
+        </TouchableOpacity>
       )}
+      <Text style={styles.warningText}>
+        Sorry, currently we are teaching beginner-level students only.
+      </Text>
     </View>
   );
+  
   
 };
 

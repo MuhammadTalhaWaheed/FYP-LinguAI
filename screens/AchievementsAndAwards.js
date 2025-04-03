@@ -1,26 +1,30 @@
-
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image } from 'react-native';
 import { getDatabase, ref, get } from 'firebase/database';
-import { useAuth } from './AuthContext';
+import { getAuth } from 'firebase/auth'; 
 
 const AchievementsAndAwards = () => {
-  const { user } = useAuth();
+  const auth = getAuth();
+  const userId = auth.currentUser ? auth.currentUser.uid : null;
+  
   const [achievements, setAchievements] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchAchievements = async () => {
+      if (!userId) return; // Exit if user is not logged in
+      
       setLoading(true);
       try {
         const db = getDatabase();
-        const achievementsRef = ref(db, `users/${user.uid}/achievements`);
+        const achievementsRef = ref(db, `users/${userId}/achievements`);
         const snapshot = await get(achievementsRef);
   
         if (snapshot.exists()) {
           const data = snapshot.val();
-          const achievementsArray = Object.values(data); // Convert object to array
-          // Filter out duplicate lessons by title
+          const achievementsArray = Object.values(data);
+
+          // Remove duplicate achievements by title
           const uniqueAchievements = achievementsArray.reduce((acc, achievement) => {
             if (!acc.some(item => item.title === achievement.title)) {
               acc.push(achievement);
@@ -28,11 +32,10 @@ const AchievementsAndAwards = () => {
             return acc;
           }, []);
 
-          // Sort achievements by date (most recent first)
+          // Sort by date (most recent first)
           uniqueAchievements.sort((a, b) => new Date(b.date) - new Date(a.date));
 
           setAchievements(uniqueAchievements);
-
         } else {
           console.log('No achievements found!');
           setAchievements([]);
@@ -44,10 +47,8 @@ const AchievementsAndAwards = () => {
       }
     };
   
-    if (user?.uid) {
-      fetchAchievements();
-    }
-  }, [user]);
+    fetchAchievements();
+  }, [userId]); // ✅ Use userId instead of user
 
   if (loading) {
     return <Text style={styles.loadingText}>Loading...</Text>;
@@ -66,11 +67,7 @@ const AchievementsAndAwards = () => {
           keyExtractor={(item, index) => index.toString()} 
           renderItem={({ item }) => (
             <View style={styles.achievementItem}>
-              {item.badgeUrl ? (
-                <Image source={{ uri: item.badgeUrl }} style={styles.badgeImage} />
-              ) : (
-                <Image source={require('../assets/logo.png')} style={styles.badgeImage} />
-              )}
+              <Image source={item.badgeUrl ? { uri: item.badgeUrl } : require('../assets/logo.png')} style={styles.badgeImage} />
               <Text style={styles.achievementTitle}>{item.title}</Text>
               <Text style={styles.achievementDescription}>{item.description}</Text>
             </View>

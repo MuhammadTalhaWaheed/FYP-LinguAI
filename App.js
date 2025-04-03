@@ -64,6 +64,7 @@ const Stack = createStackNavigator();
 const app =initializeApp(firebaseConfig);
 export default function App() {
   return (
+    
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Splash" component={SplashScreen} />

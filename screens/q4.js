@@ -45,12 +45,12 @@ const Question4Screen = ({ navigation }) => {
   };
   const handleSelect = async (option) => {
     setSelectedOption(option.id);
-    await sendTranscriptionToBackend(option.text);
-    //await saveAnswer(option.text,grammar, vocab, cohesion); 
+    navigation.navigate('q5');  // Move to the next screen immediately
+    const response= await sendTranscriptionToBackend(option.text); // Process API call in the background
+    await saveAnswer(answer, response.grammar, response.vocabulary, response.cohesion);
 
-    // Navigate to the next question
-    navigation.navigate('q5');
   };
+  
 
   // Function to save selected answer to Firestore
   const saveAnswer = async (selectedText,grammar, vocab, cohesion) => {
