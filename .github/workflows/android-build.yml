@@ -3,10 +3,10 @@ name: Build Android AAB
 on:
   push:
     branches:
-      - main  # Trigger build when pushing to the main branch
+      - master # Trigger build when pushing to the main branch
   pull_request:
     branches:
-      - main  # Trigger build when there is a pull request to the main branch
+      - master  # Trigger build when there is a pull request to the main branch
 
 jobs:
   build:
