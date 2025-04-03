@@ -1,0 +1,65 @@
+workflows:
+  version: 1.0
+
+  # Workflow for iOS build
+  ios_release:
+    name: iOS Release Workflow
+    # Trigger build on push to main branch
+    triggers:
+      - branch: main
+    scripts:
+      - name: Install dependencies
+        script: |
+          npm install
+          cd ios && pod install # Ensure CocoaPods dependencies are installed
+      - name: Build iOS
+        script: |
+          npx react-native run-ios --configuration Release # Build iOS app
+    artifacts:
+      - build/ios/*.ipa # Path to the generated IPA file
+
+  # Workflow for Android build
+  android_release:
+    name: Android Release Workflow
+    # Trigger build on push to main branch
+    triggers:
+      - branch: main
+    scripts:
+      - name: Install dependencies
+        script: |
+          npm install
+          cd android && ./gradlew clean # Clean previous builds (if necessary)
+      - name: Build APK/AAB
+        script: |
+          cd android && ./gradlew assembleRelease # Build APK/AAB
+    artifacts:
+      - build/android/app/build/outputs/bundle/release/*.aab # Path to the generated AAB file
+      - build/android/app/build/outputs/apk/release/*.apk # Path to the generated APK file
+
+  # Optional: Workflow for testing (e.g., unit tests, integration tests, etc.)
+  # Uncomment and modify the section below if you want to add tests
+  # ios_test:
+  #   name: iOS Test Workflow
+  #   triggers:
+  #     - branch: main
+  #   scripts:
+  #     - name: Install dependencies
+  #       script: |
+  #         npm install
+  #         cd ios && pod install
+  #     - name: Run iOS Tests
+  #       script: |
+  #         npx react-native test # Modify based on your testing framework (Jest, Detox, etc.)
+  
+  # android_test:
+  #   name: Android Test Workflow
+  #   triggers:
+  #     - branch: main
+  #   scripts:
+  #     - name: Install dependencies
+  #       script: |
+  #         npm install
+  #         cd android && ./gradlew clean
+  #     - name: Run Android Tests
+  #       script: |
+  #         npx react-native test # Modify based on your testing framework (Jest, etc.)
