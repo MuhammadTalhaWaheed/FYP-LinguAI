@@ -1,0 +1,39 @@
+name: Build AAB File
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: |
+          npm install
+          cd android && ./gradlew clean && cd ..
+
+      - name: Build Android App Bundle (AAB)
+        run: |
+          cd android && ./gradlew bundleRelease && cd ..
+        env:
+          GRADLE_OPTS: -Dorg.gradle.daemon=false
+
+      - name: Upload AAB to Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-bundle
+          path: android/app/build/outputs/bundle/release/app-release.aab
