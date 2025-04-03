@@ -1,5 +1,5 @@
 workflows:
-  version: 1
+  version: 2  # Specify version as a number, this should be a dictionary
 
   # Workflow for iOS build
   ios_release:
@@ -35,31 +35,3 @@ workflows:
     artifacts:
       - build/android/app/build/outputs/bundle/release/*.aab # Path to the generated AAB file
       - build/android/app/build/outputs/apk/release/*.apk # Path to the generated APK file
-
-  # Optional: Workflow for testing (e.g., unit tests, integration tests, etc.)
-  # Uncomment and modify the section below if you want to add tests
-  # ios_test:
-  #   name: iOS Test Workflow
-  #   triggers:
-  #     - branch: main
-  #   scripts:
-  #     - name: Install dependencies
-  #       script: |
-  #         npm install
-  #         cd ios && pod install
-  #     - name: Run iOS Tests
-  #       script: |
-  #         npx react-native test # Modify based on your testing framework (Jest, Detox, etc.)
-  
-  # android_test:
-  #   name: Android Test Workflow
-  #   triggers:
-  #     - branch: main
-  #   scripts:
-  #     - name: Install dependencies
-  #       script: |
-  #         npm install
-  #         cd android && ./gradlew clean
-  #     - name: Run Android Tests
-  #       script: |
-  #         npx react-native test # Modify based on your testing framework (Jest, etc.)
