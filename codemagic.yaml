@@ -1,10 +1,4 @@
 workflows:
-  version:
-    major: 1
-    minor: 0
-    patch: 0
-
-  # Workflow for iOS build
   ios_release:
     name: iOS Release Workflow
     # Trigger build on push to main branch
@@ -21,7 +15,6 @@ workflows:
     artifacts:
       - build/ios/*.ipa # Path to the generated IPA file
 
-  # Workflow for Android build
   android_release:
     name: Android Release Workflow
     # Trigger build on push to main branch
