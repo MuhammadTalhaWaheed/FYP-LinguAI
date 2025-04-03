@@ -1,5 +1,5 @@
 workflows:
-  version: 2  # Specify version as a number, this should be a dictionary
+  version: "2"  # Specify version as a number, this should be a dictionary
 
   # Workflow for iOS build
   ios_release:
