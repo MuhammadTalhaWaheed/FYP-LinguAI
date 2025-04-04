@@ -3,7 +3,7 @@ workflows:
     name: Build and Deploy Android AAB
     max_build_duration: 60  # Optional: define a max build time (in minutes)
     environment:
-      java: 11  # 👈 Add this here to ensure Gradle uses Java 11
+      java: 11  # Make sure Java 11 is used (compatible with Gradle 7.6+)
     scripts:
       - name: Install dependencies
         script: |
