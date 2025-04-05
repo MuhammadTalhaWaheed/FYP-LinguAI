@@ -20,6 +20,11 @@ buildscript {
         classpath('com.facebook.react:react-native-gradle-plugin')
         classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
     }
+    java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
 }
 
 apply plugin: "com.facebook.react.rootproject"
