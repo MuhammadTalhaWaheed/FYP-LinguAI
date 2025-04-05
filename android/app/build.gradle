@@ -86,7 +86,7 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.yourcompany.myapp'
+    namespace "com.myapp"
     defaultConfig {
         applicationId 'com.yourcompany.myapp'
         minSdkVersion rootProject.ext.minSdkVersion
@@ -124,7 +124,6 @@ android {
     androidResources {
         ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
     }
-
 }
 
 // Apply static values from `gradle.properties` to the `android.packagingOptions`
