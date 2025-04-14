@@ -6,7 +6,7 @@ buildscript {
         minSdkVersion = Integer.parseInt(findProperty('android.minSdkVersion') ?: '24')
         compileSdkVersion = Integer.parseInt(findProperty('android.compileSdkVersion') ?: '35')
         targetSdkVersion = Integer.parseInt(findProperty('android.targetSdkVersion') ?: '34')
-        kotlinVersion = findProperty('android.kotlinVersion') ?: '1.9.25'
+        kotlinVersion = findProperty('android.kotlinVersion') ?: '1.8.0'
 
         ndkVersion = "21.4.7075529"
     }
@@ -16,10 +16,13 @@ buildscript {
     }
     dependencies {
         classpath 'com.google.gms:google-services:4.3.3'
-        classpath('com.android.tools.build:gradle:8.4')
         classpath('com.facebook.react:react-native-gradle-plugin')
-        classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
+        classpath('com.android.tools.build:gradle:8.3.0')  // Or the latest stable version
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10"  // Or the latest compatible version
+        classpath "androidx.compose.compiler:compiler:1.0.0"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
+   
 }
 
 apply plugin: "com.facebook.react.rootproject"
@@ -34,9 +37,36 @@ allprojects {
             // Android JSC is installed from npm
             url(new File(['node', '--print', "require.resolve('jsc-android/package.json', { paths: [require.resolve('react-native/package.json')] })"].execute(null, rootDir).text.trim(), '../dist'))
         }
+        maven { url 'https://dl.google.com/dl/android/maven2' }
+        maven { url 'https://repo.maven.apache.org/maven2' }
 
         google()
-        mavenCentral()
-        maven { url 'https://www.jitpack.io' }
+        jcenter()
+        maven { url 'https://jitpack.io' }
+        maven { url "https://repo.maven.apache.org/maven2" }
+        tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    enabled = false
+}
+
     }
+    
+}
+repositories {
+    mavenCentral()   // ---->>> try adding this
+    mavenLocal()   // ---->>> try adding this
+    maven {
+        url("$rootDir/../node_modules/react-native/android")
+    }
+    maven {
+        url("$rootDir/../node_modules/jsc-android/dist")
+    }
+    mavenCentral {
+        content {
+            excludeGroup "com.facebook.react"
+        }
+    }
+    google()
+    maven { url 'https://www.jitpack.io' }
+    gradlePluginPortal()  // ---->>> try adding this
+    jcenter() // ---->> Add this
 }
