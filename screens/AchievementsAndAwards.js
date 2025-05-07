@@ -1,54 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image } from 'react-native';
-import { getDatabase, ref, get } from 'firebase/database';
-import { getAuth } from 'firebase/auth'; 
+import { getAuth } from 'firebase/auth';
+import { getFirestore, collection, getDocs, query } from 'firebase/firestore';
 
 const AchievementsAndAwards = () => {
   const auth = getAuth();
   const userId = auth.currentUser ? auth.currentUser.uid : null;
-  
+
   const [achievements, setAchievements] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchAchievements = async () => {
-      if (!userId) return; // Exit if user is not logged in
-      
+      if (!userId) return;
+
       setLoading(true);
       try {
-        const db = getDatabase();
-        const achievementsRef = ref(db, `users/${userId}/achievements`);
-        const snapshot = await get(achievementsRef);
-  
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          const achievementsArray = Object.values(data);
+        const db = getFirestore();
+        const achievementsRef = collection(db, `users/${userId}/achievements`);
+        const q = query(achievementsRef);
+        const snapshot = await getDocs(q);
 
-          // Remove duplicate achievements by title
-          const uniqueAchievements = achievementsArray.reduce((acc, achievement) => {
-            if (!acc.some(item => item.title === achievement.title)) {
-              acc.push(achievement);
-            }
-            return acc;
-          }, []);
+        const achievementsArray = snapshot.docs.map(doc => doc.data());
 
-          // Sort by date (most recent first)
-          uniqueAchievements.sort((a, b) => new Date(b.date) - new Date(a.date));
+        // Remove duplicate achievements by title
+        const uniqueAchievements = achievementsArray.reduce((acc, achievement) => {
+          if (!acc.some(item => item.title === achievement.title)) {
+            acc.push(achievement);
+          }
+          return acc;
+        }, []);
 
-          setAchievements(uniqueAchievements);
-        } else {
-          console.log('No achievements found!');
-          setAchievements([]);
-        }
+        // Sort by date (most recent first)
+        uniqueAchievements.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        setAchievements(uniqueAchievements);
       } catch (error) {
         console.error('Error fetching achievements:', error);
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchAchievements();
-  }, [userId]); // ✅ Use userId instead of user
+  }, [userId]);
 
   if (loading) {
     return <Text style={styles.loadingText}>Loading...</Text>;
@@ -64,10 +59,13 @@ const AchievementsAndAwards = () => {
       ) : (
         <FlatList
           data={achievements}
-          keyExtractor={(item, index) => index.toString()} 
+          keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
             <View style={styles.achievementItem}>
-              <Image source={item.badgeUrl ? { uri: item.badgeUrl } : require('../assets/logo.png')} style={styles.badgeImage} />
+              <Image
+                source={item.badgeUrl ? { uri: item.badgeUrl } : require('../assets/logo.png')}
+                style={styles.badgeImage}
+              />
               <Text style={styles.achievementTitle}>{item.title}</Text>
               <Text style={styles.achievementDescription}>{item.description}</Text>
             </View>

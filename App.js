@@ -1,5 +1,6 @@
 import React from 'react';
 import { initializeApp } from '@firebase/app';
+import 'react-native-gesture-handler';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -18,10 +19,41 @@ import Question2Screen from './screens/q2';
 import AssessmentEndScreen from './screens/assessment_end';
 import LevelScreen from './screens/level';
 import HomeScreen from './screens/home';
+import B1_HomeScreen from './screens/home2';
+
 import LessonScreen from './screens/lessons';
 import ChapterScreen from './screens/chapters';
 import l2_ChapterScreen from './screens/chapters_l2';
 import l3_ChapterScreen from './screens/chapters_l3';
+
+
+import B1_LessonScreen from './screens/B1_lessons';
+import B1_ChapterScreen from './screens/B1_chapters';
+import B1_l2_ChapterScreen from './screens/B1_chapters_l2';
+import B1_l3_ChapterScreen from './screens/B1_chapters_l3';
+
+
+import B1_Chapter1Screen from './screens/B1_Chapter1';
+import B1_Chapter2Screen from './screens/B1_Chapter2';
+import B1_Chapter3Screen from './screens/B1_Chapter3';
+import B1_Chapter4Screen from './screens/B1_Chapter4';
+import B1_Chapter5Screen from './screens/B1_Chapter5';
+import B1_Lesson1_quiz from './screens/B1_lesson1_quiz';
+
+import B1_l2_Chapter1Screen from './screens/B1_l2_chapter1';
+import B1_l2_Chapter2Screen from './screens/B1_l2_chapter2';
+import B1_l2_Chapter3Screen from './screens/B1_l2_chapter3';
+import B1_l2_Chapter4Screen from './screens/B1_l2_chapter4';
+import B1_l2_Chapter5Screen from './screens/B1_l2_chapter5';
+import B1_Lesson2_quiz from './screens/B1_lesson2_quiz';
+import B1_Lesson3_quiz from './screens/B1_lesson3_quiz';
+
+import Lesson_award_inter_to_adv from './screens/lesson_award_inter_to_adv';
+import B1_l3_Chapter1Screen from './screens/B1_l3_chapter1';
+import B1_l3_Chapter2Screen from './screens/B1_l3_chapter2';
+import B1_l3_Chapter3Screen from './screens/B1_l3_chapter3';
+import B1_l3_Chapter4Screen from './screens/B1_l3_chapter4';
+import B1_l3_Chapter5Screen from './screens/B1_l3_chapter5';
 
 import Chapter1Screen from './screens/Chapter1';
 import Chapter2Screen from './screens/Chapter2';
@@ -81,8 +113,13 @@ export default function App() {
         <Stack.Screen name="assessment_end" component={AssessmentEndScreen}/>
         <Stack.Screen name='level' component={LevelScreen}/>
         <Stack.Screen name='home' component={HomeScreen}/>
+        <Stack.Screen name='home2' component={B1_HomeScreen}/>
+
         <Stack.Screen name='lessons' component={LessonScreen}/>
         <Stack.Screen name='chapters' component={ChapterScreen}/>
+        
+        <Stack.Screen name='B1_lessons' component={B1_LessonScreen}/>
+        <Stack.Screen name='B1_chapters' component={B1_ChapterScreen}/>
 
 
         <Stack.Screen name='Chapter1' component={Chapter1Screen}/>
@@ -107,6 +144,30 @@ export default function App() {
         <Stack.Screen name='l3_chapter4' component={l3_Chapter4Screen}/>
         <Stack.Screen name='l3_chapter5' component={l3_Chapter5Screen}/>
         <Stack.Screen name='lesson3_quiz' component={Lesson3_quiz}/>
+
+
+        <Stack.Screen name='B1_Chapter1' component={B1_Chapter1Screen}/>
+        <Stack.Screen name='B1_Chapter2' component={B1_Chapter2Screen}/>
+        <Stack.Screen name='B1_Chapter3' component={B1_Chapter3Screen}/>
+        <Stack.Screen name='B1_Chapter4' component={B1_Chapter4Screen}/>
+        <Stack.Screen name='B1_Chapter5' component={B1_Chapter5Screen}/>
+        <Stack.Screen name='B1_lesson1_quiz' component={B1_Lesson1_quiz}/>
+        <Stack.Screen name='B1_chapters_l2' component={B1_l2_ChapterScreen}/>
+
+        <Stack.Screen name='B1_l2_chapter1' component={B1_l2_Chapter1Screen}/>
+        <Stack.Screen name='B1_l2_chapter2' component={B1_l2_Chapter2Screen}/>
+        <Stack.Screen name='B1_l2_chapter3' component={B1_l2_Chapter3Screen}/>
+        <Stack.Screen name='B1_l2_chapter4' component={B1_l2_Chapter4Screen}/>
+        <Stack.Screen name='B1_l2_chapter5' component={B1_l2_Chapter5Screen}/>
+        <Stack.Screen name='B1_lesson2_quiz' component={B1_Lesson2_quiz}/>
+
+        <Stack.Screen name='B1_chapters_l3' component={B1_l3_ChapterScreen}/>
+        <Stack.Screen name='B1_l3_chapter1' component={B1_l3_Chapter1Screen}/>
+        <Stack.Screen name='B1_l3_chapter2' component={B1_l3_Chapter2Screen}/>
+        <Stack.Screen name='B1_l3_chapter3' component={B1_l3_Chapter3Screen}/>
+        <Stack.Screen name='B1_l3_chapter4' component={B1_l3_Chapter4Screen}/>
+        <Stack.Screen name='B1_l3_chapter5' component={B1_l3_Chapter5Screen}/>
+        <Stack.Screen name='B1_lesson3_quiz' component={B1_Lesson3_quiz}/>
 
         <Stack.Screen name='Lesson_award_beg_to_inter' component={Lesson_award_beg_to_inter}/>
 

@@ -5,6 +5,7 @@ import { getAuth } from "firebase/auth";
 import { getDatabase, ref, get } from "firebase/database";
 import { useFocusEffect } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+  import { getFirestore, doc, getDoc } from "firebase/firestore"; // Add this with other imports
 
 const LessonScreen = ({ navigation }) => {
   const [lesson1Score, setLesson1Score] = useState(0);
@@ -14,31 +15,30 @@ const LessonScreen = ({ navigation }) => {
   const fetchScores = async () => {
     const auth = getAuth();
     const user = auth.currentUser;
-
+  
     if (!user) {
       Alert.alert("Error", "You must be logged in to view lessons.");
       return;
     }
-
-    const db = getDatabase();
-    const lesson1Ref = ref(db, `users/${user.uid}/user_lesson_1_score`);
-    const lesson2Ref = ref(db, `users/${user.uid}/user_lesson_2_score`);
-
+  
+    const db = getFirestore();
+    const lesson1Ref = doc(db, `users/${user.uid}/scores/lesson_1`);
+    const lesson2Ref = doc(db, `users/${user.uid}/scores/lesson_2`);
+  
     try {
-      const lesson1Snapshot = await get(lesson1Ref);
-      const lesson2Snapshot = await get(lesson2Ref);
-
-      const lesson1Score = lesson1Snapshot.exists() ? lesson1Snapshot.val() : 0;
-      const lesson2Score = lesson2Snapshot.exists() ? lesson2Snapshot.val() : 0;
-
+      const lesson1Snap = await getDoc(lesson1Ref);
+      const lesson2Snap = await getDoc(lesson2Ref);
+  
+      const lesson1Score = lesson1Snap.exists() ? lesson1Snap.data().score || 0 : 0;
+      const lesson2Score = lesson2Snap.exists() ? lesson2Snap.data().score || 0 : 0;
+  
       setLesson1Score(lesson1Score);
       setLesson2Score(lesson2Score);
-
-      // Unlock Lesson 2 & 3 if both scores are ≥3
-      setLessonsUnlocked(lesson1Score >= 3 && lesson2Score >= 3);
+  
+      setLessonsUnlocked(lesson1Score >= 2 && lesson2Score >= 2);
     } catch (error) {
-      console.error("Error fetching scores:", error);
-      Alert.alert("Error", "Failed to fetch scores. Please try again.");
+      console.error("Error fetching scores from Firestore:", error);
+      Alert.alert("Error", "Could not fetch scores. Please try again.");
     }
   };
 

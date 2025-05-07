@@ -47,10 +47,9 @@ const LevelScreen = ({ navigation }) => {
 
           if (overallScore >= 98) {
             setUserLevel('Advanced');
-            saveAnswer(0);
 
-          } else if (overallScore <= 97 && overallScore >= 95) {
-            saveAnswer(0);
+
+          } else if (overallScore < 98 && overallScore >= 95) {
 
             setUserLevel('Intermediate');
           } else {
@@ -97,25 +96,43 @@ const LevelScreen = ({ navigation }) => {
         </Text>
       </View>
   
-      {userLevel === 'Beginner' ? (
-        <TouchableOpacity
-          style={styles.startButton}
-          onPress={() => navigation.navigate('welcome')} // Change 'home' to 'welcome'
-        >
-          <Text style={styles.buttonText}>Go to Welcome Screen</Text>
-          <Text style={styles.arrow}>→</Text>
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          style={styles.startButton}
-          onPress={() => navigation.navigate('welcome')}
-        >
-          <Text style={styles.buttonText}>Go back</Text>
-        </TouchableOpacity>
-      )}
-      <Text style={styles.warningText}>
-        Sorry, currently we are teaching beginner-level students only.
-      </Text>
+      {userLevel === 'Beginner' && (
+  <>
+    <TouchableOpacity
+      style={styles.startButton}
+      onPress={() => navigation.navigate('home')}
+    >
+      <Text style={styles.buttonText}>Go to Welcome Screen</Text>
+      <Text style={styles.arrow}>→</Text>
+    </TouchableOpacity>
+  </>
+)}
+
+{userLevel === 'Intermediate' && (
+  <TouchableOpacity
+    style={styles.startButton}
+    onPress={() => navigation.navigate('home2')}
+  >
+    <Text style={styles.buttonText}>Proceed to Lessons</Text>
+    <Text style={styles.arrow}>→</Text>
+  </TouchableOpacity>
+)}
+
+{userLevel === 'Advanced' && (
+  <>
+    <Text style={styles.warningText}>
+      Sorry, we aren't dealing with advanced level students right now.
+    </Text>
+    <TouchableOpacity
+      style={styles.startButton}
+      onPress={() => navigation.navigate('welcome')}
+    >
+      <Text style={styles.buttonText}>Go to Welcome Screen</Text>
+      <Text style={styles.arrow}>→</Text>
+    </TouchableOpacity>
+  </>
+)}
+
     </View>
   );
   

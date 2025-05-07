@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "my-app",
+    "name": "LinguaAI",
     "slug": "my-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/lingua.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -22,18 +22,18 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.myapp"
+      "bundleIdentifier": "com.yourname.linguaai"
     },
     "android": {
-      "googleServicesFile": "./google-services.json",
+      "package": "com.yourname.linguaai",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.yourcompany.myapp",
       "permissions": [
         "android.permission.RECORD_AUDIO"
-      ]
+      ],
+      "jsEngine": "hermes"
     },
     "web": {
       "favicon": "./assets/favicon.png"

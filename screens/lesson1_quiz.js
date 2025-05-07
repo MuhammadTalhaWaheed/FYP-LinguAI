@@ -3,34 +3,40 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Speech from 'expo-speech';
 import { Picker } from '@react-native-picker/picker';
-import { getDatabase, ref, set ,push} from 'firebase/database';  
+import { getDatabase, set ,push} from 'firebase/database';  
 import { getAuth } from 'firebase/auth';
 import { Audio } from 'expo-av';
-import { getFirestore, doc, setDoc } from "firebase/firestore"; 
+import { getFirestore, doc, setDoc, collection, addDoc } from "firebase/firestore";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 const saveAnswer = async (selectedText, pronunciation, completeness, fluency, accuracy) => {
   const auth = getAuth();
-const userId = auth.currentUser ? auth.currentUser.uid : null;
-  if (userId) {
-    const db = getFirestore();
-    try {
-      await setDoc(doc(db, "quiz_answers", userId), {
-        answer1: {
-          transcription: selectedText,
-          fluency: fluency,
-          completeness: completeness,
-          pronunciation: pronunciation,
-          accuracy: accuracy
-        }
-      }, { merge: true });
-      console.log("Answer and scores saved successfully!");
-    } catch (error) {
-      console.error("Error saving answer and scores: ", error);
-    }
-  } else {
-    console.error("No user is logged in! Redirecting to login.");
+  const user = auth.currentUser;
+  
+  if (!user) {
+    console.error("No user logged in!");
+    return;
+  }
 
+  try {
+    // Save only metadata to Firestore (no audio URL)
+    const db = getFirestore();
+    await setDoc(doc(db, "quiz_answers", user.uid), {
+      answer1: {
+        userEmail: user.email,
+        transcription: selectedText,
+        pronunciation,
+        completeness,
+        fluency,
+        accuracy,
+        timestamp: new Date()
+      }
+    }, { merge: true });
+
+    console.log("Data saved successfully!");
+  } catch (error) {
+    console.error("Error saving data:", error);
   }
 };
 
@@ -133,14 +139,16 @@ const Lesson1_quiz = ({ navigation }) => {
       Alert.alert("Upload Failed", "Could not upload the audio file.");
     }
   };
-  
   const submitAssessment = async () => {
     let score = 0;
-  
+    console.log("Trying to save score...");
     if (selectedAnswer === "greeting") score += 1;
     if (fillBlankAnswer.trim().toLowerCase() === "like") score += 1;
     if (multipleChoiceAnswer === "A") score += 1;
-  
+    console.log("Selected Answer:", selectedAnswer);
+    console.log("Fill in the blank Answer:", fillBlankAnswer);
+    console.log("Multiple Choice Answer:", multipleChoiceAnswer);
+    
     const auth = getAuth();
     const user = auth.currentUser;
   
@@ -148,25 +156,29 @@ const Lesson1_quiz = ({ navigation }) => {
       Alert.alert("Error", "You must be logged in to save your score.");
       return;
     }
-  
-    const db = getDatabase();
-    const userScoreRef = ref(db, `users/${user.uid}/user_lesson_1_score`);
+    console.log("Current user:", user);
     
-    const achievementsRef = ref(db, `users/${user.uid}/achievements`);
-    const progressRef = ref(db, `users/${user.uid}/progress`);
-  
-  
+    // Initialize Firestore
+    const db = getFirestore();
+    
+    // Reference to the user's score in Firestore
+    const userScoreRef = doc(db, `users/${user.uid}/scores`, 'lesson_1');
+    
     try {
-      await set(userScoreRef, score);
+      // Save the score document
+      await setDoc(userScoreRef, { score: score });
       let feedback = '';
+      
       if (score === 3) {
         feedback = 'Excellent work! You aced Lesson 1.';
         Alert.alert("Assessment Submitted");
         navigation.navigate('l2_chapter1');
-      }else{
+      } else {
         feedback = 'Keep trying! Review Lesson 1 and try again.';
         Alert.alert("You couldn't pass the quiz. Try again!");
       }
+  
+      // Save the progress in Firestore
       const progress = {
         lesson: 'Lesson 1',
         score: score,
@@ -174,25 +186,30 @@ const Lesson1_quiz = ({ navigation }) => {
         date: new Date().toISOString(),
         badgeUrl: '../assets/logo.png',
       };
-      const newProgressRef = ref(db, `users/${user.uid}/progress`);
-      await push(newProgressRef, progress);
-      if (score ==3) {
+      
+      // Create a progress document for the user
+      const progressRef = collection(db, `users/${user.uid}/progress`);
+      await addDoc(progressRef, progress);
+  
+      // If score is 3, create an achievement document
+      if (score >= 2) {
         const newAchievement = {
           title: "Lesson 1 Passed",
           description: "You successfully passed Lesson 1!",
           date: new Date().toISOString(),
           badgeUrl: '../assets/logo.png',
         };
-        const newAchievementRef = ref(db, `users/${user.uid}/achievements`);
-        await push(newAchievementRef, newAchievement);
+        
+        const achievementRef = collection(db, `users/${user.uid}/achievements`);
+        await addDoc(achievementRef, newAchievement);
       }
-
+  
     } catch (error) {
       console.error("Error saving score:", error);
       Alert.alert("Error", "Failed to save your score. Please try again.");
     }
   };
-
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Lesson 1 Assessment</Text>

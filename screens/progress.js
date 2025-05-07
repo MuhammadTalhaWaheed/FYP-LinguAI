@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
+import { collection, addDoc } from "firebase/firestore";
 
 function QuizResults() {
   const [quizData, setQuizData] = useState([]);

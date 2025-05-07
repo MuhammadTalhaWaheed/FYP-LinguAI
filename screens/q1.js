@@ -9,31 +9,36 @@ import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth"; 
 import { useNavigation } from "@react-navigation/native"; 
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 const saveAnswer = async (selectedText, pronunciation, completeness, fluency, accuracy) => {
   const auth = getAuth();
-const userId = auth.currentUser ? auth.currentUser.uid : null;
-  if (userId) {
-    const db = getFirestore();
-    try {
-      await setDoc(doc(db, "user_answers", userId), {
-        answer1: {
-          transcription: selectedText,
-          fluency: fluency,
-          completeness: completeness,
-          pronunciation: pronunciation,
-          accuracy: accuracy
-        }
-      }, { merge: true });
-      console.log("Answer and scores saved successfully!");
-    } catch (error) {
-      console.error("Error saving answer and scores: ", error);
-    }
-  } else {
-    console.error("No user is logged in! Redirecting to login.");
+  const user = auth.currentUser;
 
+  if (!user) {
+    console.error("No user logged in!");
+    return;
+  }
+
+  try {
+    const db = getFirestore();
+    await setDoc(doc(db, "user_answers", user.uid), {
+      answer1: {
+        userEmail: user.email,
+        transcription: selectedText,
+        pronunciation,
+        completeness,
+        fluency,
+        accuracy,
+        timestamp: new Date()
+      }
+    }, { merge: true });
+
+    console.log("Data saved successfully (without audio).");
+  } catch (error) {
+    console.error("Error saving data:", error);
   }
 };
+
 const Question1Screen = () => {
   const [recording, setRecording] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
