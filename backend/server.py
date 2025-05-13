@@ -343,7 +343,33 @@ def get_i_score():
 
     except Exception as e:
         return jsonify({"error": f"Error fetching i_score: {str(e)}"}), 500
-       
+@app.route('/get_q_score', methods=['POST'])
+def get_q_score():
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+
+        # Fetch user data from Firestore
+        user_doc = db.collection('scores').document(user_id).get()
+
+        if not user_doc.exists:
+            return jsonify({"error": "User data not found"}), 404
+
+        user_data = user_doc.to_dict()
+        q_score = user_data.get('q_score', 0) 
+        print(f"Searching for document ID: {user_id}")
+
+         # Default to 0 if not found
+        print('the score is:')
+        print(q_score)
+
+        return jsonify({"q_score": q_score}), 200
+
+    except Exception as e:
+        return jsonify({"error": f"Error fetching i_score: {str(e)}"}), 500       
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 10000))  # Get PORT from Render
     app.run(host='0.0.0.0', port=port, debug=True)

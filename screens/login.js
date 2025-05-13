@@ -27,11 +27,26 @@ const LoginScreen = ({ navigation }) => {
 
       const iScoreData = await iScoreResponse.json();
       const iScore = iScoreData?.i_score ?? 0;
+      console.log('iScore:', iScore);
 
+      const qScoreResponse = await fetch(`https://fyp-linguai.onrender.com/get_q_score`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user_id: user.uid}),
+      });
+
+      const qScoreData = await qScoreResponse.json();
+      const qScore = qScoreData?.q_score ?? 0;
+      console.log('qScore:', qScore);
       if (iScore == 0) {
         navigation.navigate('assessment_start', { userId: user.uid });
       } else if (iScore >=95 ) {
-        navigation.navigate('home', { userId: user.uid });
+        navigation.navigate('home2', { userId: user.uid });
+      }
+      else if (iScore < 95 && qScore >= 95) {
+        navigation.navigate('home2', { userId: user.uid });
       }
       else{
         navigation.navigate('home', { userId: user.uid });
