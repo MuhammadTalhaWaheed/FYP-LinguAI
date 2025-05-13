@@ -62,6 +62,11 @@ const Lesson_award_beg_to_inter = ({ navigation }) => {
           // Compare i_score with overallScore
           if (iScore < overallScore) {
             setUserLevel('Moderate');
+            Alert.alert(
+                'Level Status',
+                "Congratulations! you improved the level. Start your intermediate to advanced level journey!",
+                [{ text: 'OK', onPress: () => navigation.navigate('home2') }]
+              );
           } else {
             setUserLevel('Beginner');
             Alert.alert(

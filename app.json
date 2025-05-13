@@ -25,15 +25,16 @@
       "bundleIdentifier": "com.yourname.linguaai"
     },
     "android": {
-      "package": "com.yourname.linguaai",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "package": "com.yourname.linguaai",
       "permissions": [
         "android.permission.RECORD_AUDIO"
       ],
-      "jsEngine": "hermes"
+      "jsEngine": "jsc"
     },
     "web": {
       "favicon": "./assets/favicon.png"

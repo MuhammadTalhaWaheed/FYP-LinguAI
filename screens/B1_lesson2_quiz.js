@@ -24,7 +24,7 @@ const saveAnswer = async (selectedText, pronunciation, completeness, fluency, ac
     // Save only metadata to Firestore (no audio URL)
     const db = getFirestore();
     await setDoc(doc(db, "quiz_answers", user.uid), {
-      answer2: {
+      answerL2_2: {
         userEmail: user.email,
         transcription: selectedText,
         pronunciation,
@@ -162,7 +162,7 @@ const B1_Lesson2_quiz = ({ navigation }) => {
         const db = getFirestore();
         
         // Reference to the user's score in Firestore
-        const userScoreRef = doc(db, `users/${user.uid}/scores`, 'lesson_2');
+        const userScoreRef = doc(db, `users/${user.uid}/scores_L2`, 'lesson_2');
         
         try {
           // Save the score document

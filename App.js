@@ -169,7 +169,8 @@ export default function App() {
         <Stack.Screen name='B1_l3_chapter5' component={B1_l3_Chapter5Screen}/>
         <Stack.Screen name='B1_lesson3_quiz' component={B1_Lesson3_quiz}/>
 
-        <Stack.Screen name='Lesson_award_beg_to_inter' component={Lesson_award_beg_to_inter}/>
+        <Stack.Screen name='lesson_award_beg_to_inter' component={Lesson_award_beg_to_inter}/>
+        <Stack.Screen name='lesson_award_inter_to_adv' component={Lesson_award_inter_to_adv}/>
 
         <Stack.Screen name='progress' component={QuizResults}/>
         <Stack.Screen name='AchievementsAndAwards' component={AchievementsAndAwards}/>

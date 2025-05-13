@@ -11,7 +11,7 @@ const userId = auth.currentUser ? auth.currentUser.uid : null;
     const db = getFirestore();
     try {
       await setDoc(doc(db, "scores", userId), {
-        q_score:score
+        q_scoreL2:score
       }, { merge: true });
       console.log("Answer and scores saved successfully!");
     } catch (error) {
@@ -33,7 +33,7 @@ const Lesson_award_inter_to_adv = ({ navigation }) => {
     const fetchUserScores = async () => {
       try {
         // Fetch the user's average scores
-        const response = await fetch(`https://fyp-linguai.onrender.com/calculate_average_lesson_scores`, {
+        const response = await fetch(`https://fyp-linguai.onrender.com/calculate_average_lesson_scores_L2`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -62,12 +62,17 @@ const Lesson_award_inter_to_adv = ({ navigation }) => {
           // Compare i_score with overallScore
           if (iScore < overallScore) {
             setUserLevel('advanced');
+            Alert.alert(
+                'Level Status',
+                "Congratulations!, you have increased your level to advanced level.",
+                [{ text: 'OK', onPress: () => navigation.navigate('home2') }]
+              );
           } else {
             setUserLevel('Intermediate');
             Alert.alert(
                 'Level Status',
                 "Sorry, you couldn't improve the level. Try again from start!",
-                [{ text: 'OK', onPress: () => navigation.navigate('home') }]
+                [{ text: 'OK', onPress: () => navigation.navigate('home2') }]
               );
           }
         } else {

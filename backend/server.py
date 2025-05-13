@@ -269,6 +269,53 @@ def calculate_average_lesson_scores():
 
     except Exception as e:
         return jsonify({"error": f"Error processing data: {str(e)}"}), 500
+@app.route('/calculate_average_lesson_scores_L2', methods=['POST'])
+def calculate_average_lesson_scores_L2():
+    data = request.get_json()
+    user_id = data.get('user_id')
+
+    if not user_id:
+        return jsonify({"error": "User ID is required"}), 400
+
+    try:
+        # Fetching user data
+        user_doc = db.collection('quiz_answers').document(user_id).get()
+        
+        if not user_doc.exists:
+            return jsonify({"error": "User data not found"}), 404
+
+        user_data = user_doc.to_dict()
+        
+        # Initialize total scores
+        total_scores = {"fluency": 0, "accuracy": 0, "completeness": 0, "pronunciation": 0}
+
+        num_answers = 3
+
+        # Iterate through all answers (answer1, answer2, etc.)
+        for key in ["answerL2_1", "answerL2_2", "answerL2_3"]:
+            answer = user_data.get(key)  # Get specific answer entry
+            if isinstance(answer, dict):  # Ensure it's a dictionary (not some other field)
+                total_scores["fluency"] += answer.get("fluency", 0)
+                total_scores["accuracy"] += answer.get("accuracy", 0)  # Assuming "accuracy" is grammar
+                total_scores["completeness"] += answer.get("completeness", 0)
+                total_scores["pronunciation"] += answer.get("pronunciation", 0)
+        
+        if num_answers == 0:
+            return jsonify({"error": "No valid answers found for user"}), 404
+
+        # Calculate averages
+        averages = {
+            "fluency": total_scores["fluency"] / num_answers,
+            "accuracy": total_scores["accuracy"] / num_answers,
+            "completeness": total_scores["completeness"] / num_answers,
+            "pronunciation": total_scores["pronunciation"] / num_answers
+        }
+        
+
+        return jsonify({"averages": averages}), 200
+
+    except Exception as e:
+        return jsonify({"error": f"Error processing data: {str(e)}"}), 500
 @app.route('/get_i_score', methods=['POST'])
 def get_i_score():
     try:

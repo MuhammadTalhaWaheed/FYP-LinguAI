@@ -22,8 +22,8 @@ const B1_LessonScreen = ({ navigation }) => {
     }
   
     const db = getFirestore();
-    const lesson1Ref = doc(db, `users/${user.uid}/scores/lesson_1`);
-    const lesson2Ref = doc(db, `users/${user.uid}/scores/lesson_2`);
+    const lesson1Ref = doc(db, `users/${user.uid}/scores_L2/lesson_1`);
+    const lesson2Ref = doc(db, `users/${user.uid}/scores_L2/lesson_2`);
   
     try {
       const lesson1Snap = await getDoc(lesson1Ref);
@@ -61,14 +61,14 @@ const B1_LessonScreen = ({ navigation }) => {
       <View style={styles.lessonsContainer}>
         <TouchableOpacity
           style={styles.lessonCard}
-          onPress={() => navigation.navigate('chapters')}
+          onPress={() => navigation.navigate('B1_chapters')}
         >
           <View style={styles.lessonInfo}>
             <Text style={styles.lessonTitle}>Lesson 1</Text>
-            <Text style={styles.lessonTitle}>Introductions</Text>
+            <Text style={styles.lessonTitle}>Handling Real-Life Situations</Text>
           </View>
           <Image source={require('../assets/module1.png')} style={styles.lessonImage} />
-          <TouchableOpacity onPress={() => navigation.navigate('chapters')}>
+          <TouchableOpacity onPress={() => navigation.navigate('B1_chapters')}>
             <Text style={styles.viewButton}>View</Text>
           </TouchableOpacity>
         </TouchableOpacity>
@@ -76,14 +76,14 @@ const B1_LessonScreen = ({ navigation }) => {
         {lesson1Score >= 3 ? (
           <TouchableOpacity
             style={styles.lessonCard}
-            onPress={() => navigation.navigate('chapters_l2')}
+            onPress={() => navigation.navigate('B1_chapters_l2')}
           >
             <View style={styles.lessonInfo}>
               <Text style={styles.lessonTitle}>Lesson 2</Text>
-              <Text style={styles.lessonTitle}>Daily Activities</Text>
+              <Text style={styles.lessonTitle}>Making Plans and Expressing Opinions</Text>
             </View>
             <Image source={require('../assets/module2.png')} style={styles.lessonImage} />
-            <TouchableOpacity onPress={() => navigation.navigate('chapters_l2')}>
+            <TouchableOpacity onPress={() => navigation.navigate('B1_chapters_l2')}>
               <Text style={styles.viewButton}>View</Text>
             </TouchableOpacity>
           </TouchableOpacity>
@@ -91,7 +91,7 @@ const B1_LessonScreen = ({ navigation }) => {
           <View style={[styles.lessonCard, styles.locked]}>
             <View style={styles.lessonInfo}>
               <Text style={styles.lessonTitle}>Lesson 2</Text>
-              <Text style={styles.lessonTitle}>Daily Activities</Text>
+              <Text style={styles.lessonTitle}>Making Plans and Expressing Opinions</Text>
             </View>
             <Image source={require('../assets/module2.png')} style={styles.lessonImage} />
             <MaterialCommunityIcons name="lock" size={24} color="white" style={styles.lockIcon} />
@@ -101,14 +101,14 @@ const B1_LessonScreen = ({ navigation }) => {
         {lessonsUnlocked ? (
           <TouchableOpacity
             style={styles.lessonCard}
-            onPress={() => navigation.navigate('chapters_l3')}
+            onPress={() => navigation.navigate('B1_chapters_l3')}
           >
             <View style={styles.lessonInfo}>
               <Text style={styles.lessonTitle}>Lesson 3</Text>
-              <Text style={styles.lessonTitle}>Social Conversations</Text>
+              <Text style={styles.lessonTitle}>Workplace and Professional Communication</Text>
             </View>
             <Image source={require('../assets/module3.png')} style={styles.lessonImage} />
-            <TouchableOpacity onPress={() => navigation.navigate('chapters_l3')}>
+            <TouchableOpacity onPress={() => navigation.navigate('B1_chapters_l3')}>
               <Text style={styles.viewButton}>View</Text>
             </TouchableOpacity>
           </TouchableOpacity>
@@ -116,7 +116,7 @@ const B1_LessonScreen = ({ navigation }) => {
           <View style={[styles.lessonCard, styles.locked]}>
             <View style={styles.lessonInfo}>
               <Text style={styles.lessonTitle}>Lesson 3</Text>
-              <Text style={styles.lessonTitle}>Social Conversations</Text>
+              <Text style={styles.lessonTitle}>Workplace and Professional Communication</Text>
             </View>
             <Image source={require('../assets/module3.png')} style={styles.lessonImage} />
             <MaterialCommunityIcons name="lock" size={24} color="white" style={styles.lockIcon} />

@@ -28,10 +28,13 @@ const LoginScreen = ({ navigation }) => {
       const iScoreData = await iScoreResponse.json();
       const iScore = iScoreData?.i_score ?? 0;
 
-      if (iScore !== 0) {
-        navigation.navigate('home', { userId: user.uid });
-      } else {
+      if (iScore == 0) {
         navigation.navigate('assessment_start', { userId: user.uid });
+      } else if (iScore >=95 ) {
+        navigation.navigate('home', { userId: user.uid });
+      }
+      else{
+        navigation.navigate('home', { userId: user.uid });
       }
       
     } catch (error) {

@@ -35,7 +35,7 @@ const B1_ChapterScreen = ({ navigation }) => {
           <TouchableOpacity
             key={index}
             style={styles.chapterCard}
-            onPress={() => navigation.navigate(`Chapter${index + 1}`)}
+            onPress={() => navigation.navigate(`B1_Chapter${index + 1}`)}
           >
             <Image source={chapterImages[index + 1]} style={styles.lessonImage} />
             <Text style={styles.chapterTitle}>Chapter {index + 1}: {chapter}</Text>

@@ -50,7 +50,7 @@ const LevelScreen = ({ navigation }) => {
 
 
           } else if (overallScore < 98 && overallScore >= 95) {
-
+            saveAnswer(overallScore);
             setUserLevel('Intermediate');
           } else {
             saveAnswer(overallScore);
