@@ -5,6 +5,18 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const B1_HomeScreen = ({ navigation }) => {
+    const handleLogout = async () => {
+    const auth = getAuth();
+    try {
+      await signOut(auth);
+      console.log('User signed out successfully');
+      navigation.navigate('login'); // or your login screen route name
+    } catch (error) {
+      console.error('Sign out error:', error);
+      alert('Logout failed: ' + error.message);
+    }
+  };
+  
   return (
     <View style={styles.container}>
       <Image source={require('../assets/logo.png')} style={styles.logo} />
@@ -48,6 +60,17 @@ const B1_HomeScreen = ({ navigation }) => {
       >
         ACHIEVEMENTS AND AWARDS
       </Button>
+     <Button
+       mode="contained"
+       icon={() => <MaterialCommunityIcons name="book" size={24} color="green" />}
+       style={styles.button}
+       onPress={() => {
+         handleLogout();             
+         navigation.navigate('welcome'); 
+       }}
+     >
+       LOGOUT
+     </Button>
     </View>
   );
 };

@@ -194,8 +194,8 @@ const Lesson1_quiz = ({ navigation }) => {
       // If score is 3, create an achievement document
       if (score >= 2) {
         const newAchievement = {
-          title: "Lesson 1 Passed",
-          description: "You successfully passed Lesson 1!",
+          title: "Beginner Lesson 1 Passed",
+          description: "You successfully passed Beginner Lesson 1!",
           date: new Date().toISOString(),
           badgeUrl: '../assets/logo.png',
         };
